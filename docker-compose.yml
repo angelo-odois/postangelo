@@ -1,17 +1,12 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15-alpine
-    container_name: postangelo-db
     environment:
       POSTGRES_DB: postangelo
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: example
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-example}
     volumes:
       - db-data:/var/lib/postgresql/data
-    ports:
-      - "5435:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -20,12 +15,9 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: postangelo-redis
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redis-data:/data
-    ports:
-      - "6380:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -36,18 +28,17 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: postangelo-backend
-    env_file: .env
     environment:
-      POSTGRES_URL: postgres://postgres:example@db:5432/postangelo
+      POSTGRES_URL: postgres://postgres:${POSTGRES_PASSWORD:-example}@db:5432/postangelo
       REDIS_URL: redis://redis:6379/0
       PORT: 3001
+      JWT_SECRET: ${JWT_SECRET:-your-very-secure-secret-change-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      NODE_ENV: ${NODE_ENV:-production}
+      UPLOADS_PATH: /data/uploads
     volumes:
-      - ./backend/src:/usr/src/app/src
-      - ./backend/package.json:/usr/src/app/package.json
       - uploads:/data/uploads
-    ports:
-      - "3002:3001"
     depends_on:
       db:
         condition: service_healthy
@@ -58,18 +49,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: postangelo-frontend
-    env_file: .env
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:3002
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
       PORT: 3000
-    volumes:
-      - ./frontend/app:/usr/src/app/app
-      - ./frontend/components:/usr/src/app/components
-      - ./frontend/lib:/usr/src/app/lib
-      - ./frontend/package.json:/usr/src/app/package.json
-    ports:
-      - "3003:3000"
     depends_on:
       - backend
 
