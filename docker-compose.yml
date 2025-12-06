@@ -28,6 +28,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    command: ["node", "dist/index.js"]
     environment:
       POSTGRES_URL: postgres://postgres:${POSTGRES_PASSWORD:-example}@db:5432/postangelo
       REDIS_URL: redis://redis:6379/0
@@ -49,9 +50,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    command: ["pnpm", "start"]
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
       PORT: 3000
+      NODE_ENV: production
     depends_on:
       - backend
 
