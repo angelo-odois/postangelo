@@ -35,10 +35,9 @@ async function getPage(slug: string): Promise<PageData | null> {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string[] }>;
+  params: { slug: string[] };
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const slugPath = slug.join("/");
+  const slugPath = params.slug.join("/");
   const page = await getPage(slugPath);
 
   if (!page) {
@@ -59,10 +58,9 @@ export async function generateMetadata({
 export default async function DynamicPage({
   params,
 }: {
-  params: Promise<{ slug: string[] }>;
+  params: { slug: string[] };
 }) {
-  const { slug } = await params;
-  const slugPath = slug.join("/");
+  const slugPath = params.slug.join("/");
   const page = await getPage(slugPath);
 
   if (!page) {
