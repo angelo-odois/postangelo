@@ -6,7 +6,7 @@ import { authenticate, requireRole } from "../middlewares/auth.js";
 import { UserRole } from "../entities/index.js";
 import { cache } from "../services/redis.js";
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 const pageRepository = () => AppDataSource.getRepository(Page);
 
 /**

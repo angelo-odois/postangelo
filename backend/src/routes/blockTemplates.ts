@@ -5,7 +5,7 @@ import { asyncHandler, AppError } from "../middlewares/errorHandler.js";
 import { authenticate, requireRole } from "../middlewares/auth.js";
 import { UserRole } from "../entities/index.js";
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 const blockTemplateRepository = () => AppDataSource.getRepository(BlockTemplate);
 
 /**

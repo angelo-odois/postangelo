@@ -6,7 +6,7 @@ import { asyncHandler, AppError } from "../middlewares/errorHandler.js";
 import { authenticate } from "../middlewares/auth.js";
 import rateLimit from "express-rate-limit";
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 const userRepository = () => AppDataSource.getRepository(User);
 
 const loginLimiter = rateLimit({

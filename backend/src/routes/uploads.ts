@@ -11,7 +11,7 @@ import { authenticate, requireRole } from "../middlewares/auth.js";
 import { UserRole } from "../entities/index.js";
 import rateLimit from "express-rate-limit";
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 const assetRepository = () => AppDataSource.getRepository(Asset);
 
 const UPLOADS_PATH = process.env.UPLOADS_PATH || "/data/uploads";

@@ -109,7 +109,7 @@ async function seed() {
     });
 
     if (!existing) {
-      const newTemplate = blockTemplateRepository.create(template as Partial<BlockTemplate>);
+      const newTemplate = blockTemplateRepository.create(template as unknown as Partial<BlockTemplate>);
       await blockTemplateRepository.save(newTemplate);
       console.log(`Block template created: ${template.name}`);
     }
