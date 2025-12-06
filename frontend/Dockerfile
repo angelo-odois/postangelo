@@ -8,7 +8,8 @@ RUN corepack enable && corepack prepare pnpm@9 --activate
 # Copy package files first (for caching)
 COPY package.json ./
 
-# Install dependencies
+# Install ALL dependencies (force dev mode to include typescript/eslint)
+ENV NODE_ENV=development
 RUN pnpm install
 
 # Copy source
@@ -16,6 +17,9 @@ COPY . .
 
 # Build Next.js
 RUN pnpm build
+
+# Switch to production mode
+ENV NODE_ENV=production
 
 # Expose port
 EXPOSE 3000

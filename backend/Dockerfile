@@ -8,7 +8,8 @@ RUN corepack enable && corepack prepare pnpm@9 --activate
 # Copy package files first (for caching)
 COPY package.json ./
 
-# Install ALL dependencies (including devDependencies for build)
+# Install ALL dependencies (force dev mode to include typescript)
+ENV NODE_ENV=development
 RUN pnpm install
 
 # Copy source
@@ -17,8 +18,11 @@ COPY . .
 # Build TypeScript
 RUN pnpm build
 
+# Switch to production mode
+ENV NODE_ENV=production
+
 # Expose port
 EXPOSE 3001
 
 # Production command
-CMD ["pnpm", "start"]
+CMD ["node", "dist/index.js"]
