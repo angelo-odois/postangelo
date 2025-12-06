@@ -14,8 +14,11 @@ RUN pnpm install
 # Copy source
 COPY . .
 
+# Build Next.js
+RUN pnpm build
+
 # Expose port
 EXPOSE 3000
 
-# Development command
-CMD ["pnpm", "dev"]
+# Production command
+CMD ["pnpm", "start"]
