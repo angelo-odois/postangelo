@@ -14,6 +14,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const UPLOADS_PATH = process.env.UPLOADS_PATH || "/data/uploads";
 
+// Trust proxy for rate limiting behind reverse proxy (Coolify/Traefik)
+app.set("trust proxy", 1);
+
 // Security middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
