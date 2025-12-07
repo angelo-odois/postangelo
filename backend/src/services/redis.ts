@@ -24,7 +24,6 @@ if (redisUrl) {
   try {
     redis = new Redis(redisUrl, {
       maxRetriesPerRequest: 3,
-      retryDelayOnFailover: 100,
       lazyConnect: true,
     });
 
