@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface ImageBlockProps {
@@ -56,11 +55,9 @@ export function ImageBlock({
             shadow && "shadow-xl shadow-black/10"
           )}
         >
-          <Image
+          <img
             src={src}
             alt={alt}
-            width={1200}
-            height={675}
             className="w-full h-auto object-cover"
           />
         </div>
