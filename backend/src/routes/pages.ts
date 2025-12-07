@@ -30,7 +30,7 @@ router.get(
 
     const pages = await pageRepository().find({
       where: { status: (status as PageStatus) || PageStatus.PUBLISHED },
-      select: ["id", "title", "slug", "seoTitle", "seoDescription", "ogImageUrl", "status", "createdAt", "updatedAt"],
+      select: ["id", "title", "slug", "seoTitle", "seoDescription", "ogImageUrl", "coverImageUrl", "status", "createdAt", "updatedAt"],
       order: { createdAt: "DESC" },
     });
 
@@ -130,7 +130,7 @@ router.use(authenticate, requireRole(UserRole.ADMIN, UserRole.EDITOR));
 router.post(
   "/",
   asyncHandler(async (req, res) => {
-    const { title, slug, seoTitle, seoDescription, ogImageUrl, contentJSON, status } = req.body;
+    const { title, slug, seoTitle, seoDescription, ogImageUrl, coverImageUrl, contentJSON, status } = req.body;
 
     if (!title || !slug) {
       throw new AppError("Title and slug are required", 400);
@@ -147,6 +147,7 @@ router.post(
       seoTitle,
       seoDescription,
       ogImageUrl,
+      coverImageUrl,
       contentJSON: contentJSON || { blocks: [] },
       status: status || PageStatus.DRAFT,
       createdBy: { id: req.user!.userId },
@@ -172,7 +173,7 @@ router.put(
   "/:id",
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { title, slug, seoTitle, seoDescription, ogImageUrl, contentJSON, status } = req.body;
+    const { title, slug, seoTitle, seoDescription, ogImageUrl, coverImageUrl, contentJSON, status } = req.body;
 
     const page = await pageRepository().findOne({ where: { id } });
 
@@ -193,6 +194,7 @@ router.put(
       seoTitle: seoTitle ?? page.seoTitle,
       seoDescription: seoDescription ?? page.seoDescription,
       ogImageUrl: ogImageUrl ?? page.ogImageUrl,
+      coverImageUrl: coverImageUrl ?? page.coverImageUrl,
       contentJSON: contentJSON ?? page.contentJSON,
       status: status ?? page.status,
     });
