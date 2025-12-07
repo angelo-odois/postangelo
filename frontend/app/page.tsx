@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Metadata } from "next";
 import { ProfileImage } from "@/components/ProfileImage";
 import {
@@ -15,6 +14,7 @@ interface PageItem {
   slug: string;
   seoDescription?: string;
   ogImageUrl?: string;
+  coverImageUrl?: string;
 }
 
 async function getPages(): Promise<PageItem[]> {
@@ -464,12 +464,11 @@ export default async function HomePage() {
                 >
                   {/* Cover Image */}
                   <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-amber-500/20 via-orange-500/10 to-yellow-500/20">
-                    {page.ogImageUrl ? (
-                      <Image
-                        src={page.ogImageUrl}
+                    {(page.coverImageUrl || page.ogImageUrl) ? (
+                      <img
+                        src={page.coverImageUrl || page.ogImageUrl}
                         alt={page.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
