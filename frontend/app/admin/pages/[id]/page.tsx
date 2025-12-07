@@ -2,8 +2,8 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,12 +32,9 @@ interface PageData {
   };
 }
 
-export default function PageEditorPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
+export default function PageEditorPage() {
+  const params = useParams();
+  const id = params.id as string;
   const router = useRouter();
   const { user, accessToken } = useAuthStore();
   const { setBlocks, blocks } = useEditorStore();
