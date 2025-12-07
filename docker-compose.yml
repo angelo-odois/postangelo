@@ -1,37 +1,12 @@
 services:
-  db:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_DB: postangelo
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-example}
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - redis-data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     command: ["node", "dist/index.js"]
     environment:
-      POSTGRES_URL: postgres://postgres:${POSTGRES_PASSWORD:-example}@db:5432/postangelo
-      REDIS_URL: redis://redis:6379/0
+      POSTGRES_URL: ${POSTGRES_URL}
+      REDIS_URL: ${REDIS_URL:-}
       PORT: 3001
       JWT_SECRET: ${JWT_SECRET:-your-very-secure-secret-change-in-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
@@ -42,11 +17,6 @@ services:
       - uploads:/data/uploads
     ports:
       - "${BACKEND_PORT:-3001}:3001"
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
 
   frontend:
     build:
@@ -63,6 +33,4 @@ services:
       - backend
 
 volumes:
-  db-data:
-  redis-data:
   uploads:
