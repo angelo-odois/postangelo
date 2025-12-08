@@ -23,6 +23,7 @@ export { TeamBlock } from "./TeamBlock";
 export { TimelineBlock } from "./TimelineBlock";
 export { GalleryBlock } from "./GalleryBlock";
 export { FormBlock } from "./FormBlock";
+export { ProcessBlock, processSchema } from "./ProcessBlock";
 export { BlockRenderer } from "./BlockRenderer";
 
 export const blockRegistry = {
@@ -189,34 +190,45 @@ export const blockRegistry = {
     },
   },
   columns: {
-    name: "Columns",
+    name: "Colunas",
     category: "layout",
     schema: {
       columns: {
         type: "select",
-        label: "Number of Columns",
+        label: "Numero de Colunas",
         options: ["2", "3", "4"],
         default: "2",
       },
       gap: {
         type: "select",
-        label: "Gap Size",
+        label: "Espacamento",
         options: ["small", "medium", "large"],
         default: "medium",
       },
       style: {
         type: "select",
-        label: "Style",
+        label: "Estilo",
         options: ["simple", "cards", "bordered"],
         default: "cards",
       },
+      verticalAlign: {
+        type: "select",
+        label: "Alinhamento Vertical",
+        options: ["top", "center", "bottom"],
+        default: "top",
+      },
       items: {
         type: "repeater",
-        label: "Column Items",
+        label: "Itens das Colunas",
         default: [],
         itemSchema: {
-          title: { type: "string", label: "Title" },
-          content: { type: "richtext", label: "Content" },
+          title: { type: "string", label: "Titulo (opcional)" },
+          content: { type: "richtext", label: "Conteudo (opcional)" },
+          blocks: {
+            type: "blocks",
+            label: "Blocos Aninhados",
+            default: [],
+          },
         },
       },
     },
@@ -224,9 +236,10 @@ export const blockRegistry = {
       columns: "2",
       gap: "medium",
       style: "cards",
+      verticalAlign: "top",
       items: [
-        { title: "Column 1", content: "<p>Content for first column</p>" },
-        { title: "Column 2", content: "<p>Content for second column</p>" },
+        { title: "Coluna 1", content: "<p>Conteudo da primeira coluna</p>", blocks: [] },
+        { title: "Coluna 2", content: "<p>Conteudo da segunda coluna</p>", blocks: [] },
       ],
     },
   },
@@ -1232,6 +1245,66 @@ export const blockRegistry = {
       successMessage: "Mensagem enviada com sucesso!",
       style: "default",
       alignment: "center",
+    },
+  },
+  process: {
+    name: "Processo",
+    category: "content",
+    schema: {
+      title: { type: "string", label: "Titulo" },
+      subtitle: { type: "string", label: "Subtitulo" },
+      style: {
+        type: "select",
+        label: "Estilo",
+        options: ["horizontal", "vertical", "cards"],
+        default: "horizontal",
+      },
+      showConnectors: {
+        type: "boolean",
+        label: "Mostrar Conectores",
+        default: true,
+      },
+      iconStyle: {
+        type: "select",
+        label: "Estilo do Icone",
+        options: ["circle", "square", "minimal"],
+        default: "circle",
+      },
+      iconColor: {
+        type: "select",
+        label: "Cor do Icone",
+        options: ["amber", "primary", "muted", "gradient"],
+        default: "muted",
+      },
+      steps: {
+        type: "repeater",
+        label: "Etapas",
+        default: [],
+        itemSchema: {
+          title: { type: "string", label: "Titulo" },
+          description: { type: "string", label: "Descricao" },
+          icon: {
+            type: "select",
+            label: "Icone",
+            options: ["search", "target", "lightbulb", "pentool", "check", "rocket", "code", "palette", "users", "settings", "zap", "chart", "shield", "globe", "database", "layout", "lock"],
+            default: "search",
+          },
+        },
+      },
+    },
+    defaultProps: {
+      title: "Nosso Processo",
+      style: "horizontal",
+      showConnectors: true,
+      iconStyle: "circle",
+      iconColor: "amber",
+      steps: [
+        { title: "Pesquisa", description: "Entender o problema e contexto", icon: "search" },
+        { title: "Definicao", description: "Definir objetivos claros", icon: "target" },
+        { title: "Ideacao", description: "Gerar solucoes criativas", icon: "lightbulb" },
+        { title: "Design", description: "Prototipar e refinar", icon: "pentool" },
+        { title: "Teste", description: "Validar com usuarios", icon: "check" },
+      ],
     },
   },
 };

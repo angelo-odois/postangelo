@@ -163,7 +163,7 @@ export default function PageEditorPage() {
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="font-semibold border-0 bg-transparent p-0 h-auto text-lg focus-visible:ring-0"
+            className="font-semibold border-0 bg-transparent px-2 py-1 h-auto text-lg focus-visible:ring-1 focus-visible:ring-amber-500 hover:bg-muted/50 transition-colors min-w-[200px]"
             placeholder="Título da página"
           />
         </div>

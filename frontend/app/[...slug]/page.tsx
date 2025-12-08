@@ -70,21 +70,6 @@ export default async function DynamicPage({
 
   return (
     <main>
-      {page.coverImageUrl && (
-        <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
-          <img
-            src={page.coverImageUrl}
-            alt={page.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 lg:p-12">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
-              {page.title}
-            </h1>
-          </div>
-        </div>
-      )}
       {page.contentJSON.blocks.map((block) => (
         <BlockRenderer key={block.id} block={block} />
       ))}

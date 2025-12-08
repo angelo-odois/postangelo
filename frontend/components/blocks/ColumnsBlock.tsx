@@ -1,11 +1,19 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { BlockRenderer } from "./BlockRenderer";
+
+interface NestedBlock {
+  id: string;
+  type: string;
+  props: Record<string, unknown>;
+}
 
 interface ColumnItem {
   title?: string;
-  content: string;
+  content?: string;
   icon?: string;
+  blocks?: NestedBlock[];
 }
 
 interface ColumnsBlockProps {
@@ -13,6 +21,7 @@ interface ColumnsBlockProps {
   items?: ColumnItem[];
   gap?: "small" | "medium" | "large";
   style?: "simple" | "cards" | "bordered";
+  verticalAlign?: "top" | "center" | "bottom";
 }
 
 export function ColumnsBlock({
@@ -20,6 +29,7 @@ export function ColumnsBlock({
   items = [],
   gap = "medium",
   style = "simple",
+  verticalAlign = "top",
 }: ColumnsBlockProps) {
   const columnClasses = {
     "2": "md:grid-cols-2",
@@ -31,6 +41,12 @@ export function ColumnsBlock({
     small: "gap-4",
     medium: "gap-6",
     large: "gap-8",
+  };
+
+  const verticalAlignClasses = {
+    top: "items-start",
+    center: "items-center",
+    bottom: "items-end",
   };
 
   const getItemClasses = () => {
@@ -49,7 +65,7 @@ export function ColumnsBlock({
       <section className="py-12 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="p-8 bg-muted/30 rounded-xl border-2 border-dashed border-border text-center">
-            <p className="text-muted-foreground">Add column items</p>
+            <p className="text-muted-foreground">Adicione itens nas colunas</p>
           </div>
         </div>
       </section>
@@ -59,18 +75,37 @@ export function ColumnsBlock({
   return (
     <section className="py-12 px-6">
       <div className="max-w-6xl mx-auto">
-        <div className={cn("grid grid-cols-1", columnClasses[columns], gapClasses[gap])}>
+        <div className={cn(
+          "grid grid-cols-1",
+          columnClasses[columns],
+          gapClasses[gap],
+          verticalAlignClasses[verticalAlign]
+        )}>
           {items.map((item, index) => (
             <div key={index} className={getItemClasses()}>
+              {/* Title (optional) */}
               {item.title && (
                 <h3 className="text-xl font-bold mb-3 text-foreground">
                   {item.title}
                 </h3>
               )}
-              <div
-                className="text-muted-foreground prose prose-sm dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: item.content }}
-              />
+
+              {/* Legacy content support (richtext) */}
+              {item.content && (
+                <div
+                  className="text-muted-foreground prose prose-sm dark:prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: item.content }}
+                />
+              )}
+
+              {/* Nested blocks */}
+              {item.blocks && item.blocks.length > 0 && (
+                <div className="space-y-4">
+                  {item.blocks.map((block) => (
+                    <BlockRenderer key={block.id} block={block} />
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -82,25 +117,40 @@ export function ColumnsBlock({
 export const columnsSchema = {
   columns: {
     type: "select" as const,
-    label: "Number of Columns",
+    label: "Numero de Colunas",
     options: ["2", "3", "4"],
     default: "2",
   },
   gap: {
     type: "select" as const,
-    label: "Gap Size",
+    label: "Espacamento",
     options: ["small", "medium", "large"],
     default: "medium",
   },
   style: {
     type: "select" as const,
-    label: "Style",
+    label: "Estilo",
     options: ["simple", "cards", "bordered"],
     default: "cards",
   },
+  verticalAlign: {
+    type: "select" as const,
+    label: "Alinhamento Vertical",
+    options: ["top", "center", "bottom"],
+    default: "top",
+  },
   items: {
     type: "repeater" as const,
-    label: "Column Items",
+    label: "Itens das Colunas",
     default: [],
+    itemSchema: {
+      title: { type: "string" as const, label: "Titulo (opcional)" },
+      content: { type: "richtext" as const, label: "Conteudo (opcional)" },
+      blocks: {
+        type: "blocks" as const,
+        label: "Blocos Aninhados",
+        default: [],
+      },
+    },
   },
 };
