@@ -47,7 +47,11 @@ export default function TemplatesAdminPage() {
     if (!token) return;
 
     try {
-      const profileData = await api.getMyProfile(token).catch(() => null);
+      const profileData = await api.getMyProfile(token).catch(() => null) as {
+        template?: string;
+        accentColor?: string;
+        fontFamily?: string;
+      } | null;
       if (profileData) {
         setSettings({
           template: profileData.template || "modern",

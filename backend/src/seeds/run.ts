@@ -25,14 +25,16 @@ async function seed() {
       email: "admin@postangelo.com",
       passwordHash,
       role: UserRole.ADMIN,
+      onboardingCompleted: true,
     });
     await userRepository.save(admin);
     console.log("Admin user created: admin@postangelo.com / admin123");
   } else {
-    // Update password and username if admin already exists
+    // Update password, username and onboarding if admin already exists
     await userRepository.update(existingAdmin.id, {
       passwordHash,
       username: existingAdmin.username || "admin",
+      onboardingCompleted: true,
     });
     console.log("Admin user password and username updated: admin@postangelo.com / admin123");
   }
