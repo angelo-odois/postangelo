@@ -19,7 +19,7 @@ export function ProfileImage({ src, alt, initials, size = "lg", className = "" }
 
   return (
     <>
-      {showImage && (
+      {showImage ? (
         <Image
           src={src}
           alt={alt}
@@ -30,10 +30,11 @@ export function ProfileImage({ src, alt, initials, size = "lg", className = "" }
           priority={size === "lg"}
           onError={() => setHasError(true)}
         />
+      ) : (
+        <span className={`text-white ${textSize} font-bold select-none`}>
+          {initials}
+        </span>
       )}
-      <span className={`text-white ${textSize} font-bold select-none ${showImage ? "absolute" : ""}`}>
-        {initials}
-      </span>
     </>
   );
 }

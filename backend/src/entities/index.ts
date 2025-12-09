@@ -9,3 +9,4 @@ export { Education } from "./Education.js";
 export { Skill, SkillCategory, SkillLevel } from "./Skill.js";
 export { Project, ProjectStatus } from "./Project.js";
 export { PageTemplate, PageTemplateCategory } from "./PageTemplate.js";
+export { PageView, ViewType } from "./PageView.js";

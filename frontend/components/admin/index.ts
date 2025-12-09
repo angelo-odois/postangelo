@@ -7,3 +7,10 @@ export {
   ProjectDialog,
 } from "./portfolio-dialogs";
 export { TemplateSelectionDialog } from "./TemplateSelectionDialog";
+export {
+  ListPageSkeleton,
+  ProfilePageSkeleton,
+  SettingsPageSkeleton,
+  PagesListSkeleton,
+  DashboardSkeleton,
+} from "./skeletons";

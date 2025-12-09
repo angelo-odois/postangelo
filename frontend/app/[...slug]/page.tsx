@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
 import { BlockRenderer } from "@/components/blocks/BlockRenderer";
+import { ViewTracker } from "@/components/ViewTracker";
 import { cn } from "@/lib/utils";
 import { Home } from "lucide-react";
 
@@ -22,6 +23,11 @@ interface PageData {
     meta?: {
       layout?: "contained" | "full";
     };
+  };
+  createdBy?: {
+    id: string;
+    name: string;
+    username: string;
   };
 }
 
@@ -78,6 +84,11 @@ export default async function DynamicPage({
 
   return (
     <>
+      {/* Analytics Tracking */}
+      {page.createdBy?.username && (
+        <ViewTracker username={page.createdBy.username} pageSlug={page.slug} />
+      )}
+
       <main className={cn(
         layout === "full" && "full-width-layout"
       )}>

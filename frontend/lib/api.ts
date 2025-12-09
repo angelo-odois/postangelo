@@ -34,6 +34,12 @@ export async function fetchAPI<T>(
 
 export const api = {
   // Auth
+  register: (data: { name: string; email: string; password: string; username: string }) =>
+    fetchAPI<{ accessToken: string; refreshToken: string; user: unknown }>("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
   login: (email: string, password: string) =>
     fetchAPI<{ accessToken: string; refreshToken: string; user: unknown }>("/api/auth/login", {
       method: "POST",
@@ -48,6 +54,12 @@ export const api = {
 
   getMe: (token: string) =>
     fetchAPI("/api/auth/me", { token }),
+
+  completeOnboarding: (token: string) =>
+    fetchAPI("/api/auth/complete-onboarding", {
+      method: "POST",
+      token,
+    }),
 
   // Pages
   getPages: (status?: string) =>
@@ -255,6 +267,28 @@ export const api = {
   checkUsername: (username: string, token: string) =>
     fetchAPI<{ available: boolean; reason?: string }>(`/api/portfolio/check-username/${username}`, { token }),
 
+  // Account Settings
+  changePassword: (currentPassword: string, newPassword: string, token: string) =>
+    fetchAPI("/api/auth/change-password", {
+      method: "POST",
+      body: JSON.stringify({ currentPassword, newPassword }),
+      token,
+    }),
+
+  updateAvatar: (avatarUrl: string, token: string) =>
+    fetchAPI("/api/auth/avatar", {
+      method: "PUT",
+      body: JSON.stringify({ avatarUrl }),
+      token,
+    }),
+
+  deleteAccount: (password: string, token: string) =>
+    fetchAPI("/api/auth/delete-account", {
+      method: "DELETE",
+      body: JSON.stringify({ password }),
+      token,
+    }),
+
   // Page Templates
   getPageTemplates: () =>
     fetchAPI<PageTemplate[]>("/api/page-templates"),
@@ -278,6 +312,22 @@ export const api = {
       token,
     });
   },
+
+  // Analytics
+  trackView: (username: string, pageSlug?: string, referrer?: string) =>
+    fetchAPI("/api/analytics/track", {
+      method: "POST",
+      body: JSON.stringify({ username, pageSlug, referrer }),
+    }).catch(() => {}), // Silently fail - analytics should not break the page
+
+  getAnalyticsOverview: (token: string, period: "7d" | "30d" | "90d" | "all" = "30d") =>
+    fetchAPI<AnalyticsOverview>(`/api/analytics/overview?period=${period}`, { token }),
+
+  getAnalyticsChart: (token: string, period: "7d" | "30d" | "90d" = "30d") =>
+    fetchAPI<{ chartData: ChartDataPoint[] }>(`/api/analytics/chart?period=${period}`, { token }),
+
+  getAnalyticsPages: (token: string, period: "7d" | "30d" | "90d" = "30d") =>
+    fetchAPI<{ pages: PageAnalytics[] }>(`/api/analytics/pages?period=${period}`, { token }),
 };
 
 // Types for Page Templates
@@ -296,4 +346,28 @@ export interface PageTemplate {
   isPremium: boolean;
   order: number;
   isActive: boolean;
+}
+
+// Types for Analytics
+export interface AnalyticsOverview {
+  period: string;
+  totalViews: number;
+  portfolioViews: number;
+  pageViews: number;
+  uniqueVisitors: number;
+  byDevice: { device: string; count: string }[];
+  byBrowser: { browser: string; count: string }[];
+  topReferrers: { referrer: string; count: string }[];
+}
+
+export interface ChartDataPoint {
+  date: string;
+  views: number;
+}
+
+export interface PageAnalytics {
+  pageId: string;
+  title: string;
+  slug: string;
+  views: string;
 }

@@ -44,6 +44,12 @@ export class User {
   })
   role!: UserRole;
 
+  @Column({ type: "varchar", length: 500, nullable: true, name: "avatar_url" })
+  avatarUrl?: string;
+
+  @Column({ type: "boolean", default: false, name: "onboarding_completed" })
+  onboardingCompleted!: boolean;
+
   @CreateDateColumn({ name: "created_at" })
   createdAt!: Date;
 

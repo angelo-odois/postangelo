@@ -106,7 +106,7 @@ router.get(
     const response = {
       ...page,
       createdBy: page.createdBy
-        ? { id: page.createdBy.id, name: page.createdBy.name }
+        ? { id: page.createdBy.id, name: page.createdBy.name, username: page.createdBy.username }
         : null,
     };
 

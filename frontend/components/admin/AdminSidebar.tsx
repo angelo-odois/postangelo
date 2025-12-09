@@ -16,6 +16,9 @@ import {
   ExternalLink,
   Menu,
   X,
+  Settings,
+  BarChart3,
+  Paintbrush,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/lib/store";
@@ -41,6 +44,11 @@ const navSections: NavSection[] = [
         title: "Dashboard",
         href: "/admin/dashboard",
         icon: LayoutDashboard,
+      },
+      {
+        title: "Analytics",
+        href: "/admin/analytics",
+        icon: BarChart3,
       },
     ],
   },
@@ -76,6 +84,21 @@ const navSections: NavSection[] = [
         title: "Projetos",
         href: "/admin/pages",
         icon: FolderKanban,
+      },
+      {
+        title: "Aparencia",
+        href: "/admin/templates",
+        icon: Paintbrush,
+      },
+    ],
+  },
+  {
+    label: "",
+    items: [
+      {
+        title: "Configuracoes",
+        href: "/admin/settings",
+        icon: Settings,
       },
     ],
   },

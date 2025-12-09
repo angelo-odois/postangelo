@@ -18,6 +18,7 @@ import {
 import { BlockEditor } from "@/components/editor/BlockEditor";
 import { useAuthStore, useEditorStore, Block } from "@/lib/store";
 import { api } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 interface PageData {
   id: string;
@@ -136,7 +137,7 @@ export default function PageEditorPage() {
       );
     } catch (error) {
       console.error("Failed to save page:", error);
-      alert("Erro ao salvar página");
+      toast({ title: "Erro ao salvar pagina", variant: "destructive" });
     } finally {
       setSaving(false);
     }

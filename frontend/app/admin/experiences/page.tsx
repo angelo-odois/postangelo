@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
-import { AdminLayout, ExperienceDialog } from "@/components/admin";
+import { AdminLayout, ExperienceDialog, ListPageSkeleton } from "@/components/admin";
 import { SortableList } from "@/components/ui/sortable-list";
 
 interface Experience {
@@ -112,9 +112,7 @@ export default function ExperiencesAdminPage() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
-        </div>
+        <ListPageSkeleton count={3} />
       </AdminLayout>
     );
   }

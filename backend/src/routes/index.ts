@@ -10,6 +10,7 @@ import skillsRoutes from "./skills.js";
 import projectsRoutes from "./projects.js";
 import portfolioRoutes from "./portfolio.js";
 import pageTemplatesRoutes from "./pageTemplates.js";
+import analyticsRoutes from "./analytics.js";
 
 const router: ReturnType<typeof Router> = Router();
 
@@ -26,5 +27,6 @@ router.use("/skills", skillsRoutes);
 router.use("/projects", projectsRoutes);
 router.use("/portfolio", portfolioRoutes);
 router.use("/page-templates", pageTemplatesRoutes);
+router.use("/analytics", analyticsRoutes);
 
 export default router;

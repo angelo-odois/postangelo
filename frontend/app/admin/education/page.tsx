@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
-import { AdminLayout, EducationDialog } from "@/components/admin";
+import { AdminLayout, EducationDialog, ListPageSkeleton } from "@/components/admin";
 import { SortableList } from "@/components/ui/sortable-list";
 
 interface Education {
@@ -111,9 +111,7 @@ export default function EducationAdminPage() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
-        </div>
+        <ListPageSkeleton count={2} />
       </AdminLayout>
     );
   }

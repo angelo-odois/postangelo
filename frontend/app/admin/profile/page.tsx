@@ -3,20 +3,19 @@
 import { useEffect, useState } from "react";
 import {
   Save,
-  Check,
-  X,
   Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
-import { AdminLayout } from "@/components/admin";
+import { AdminLayout, ProfilePageSkeleton } from "@/components/admin";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { toast } from "@/hooks/use-toast";
 
 interface Profile {
   id?: string;
@@ -41,14 +40,11 @@ interface Profile {
 }
 
 export default function ProfileAdminPage() {
-  const { user, getValidToken, updateUser } = useAuthStore();
+  const { getValidToken } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const [profile, setProfile] = useState<Profile>({ fullName: "" });
-  const [username, setUsername] = useState("");
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
-  const [checkingUsername, setCheckingUsername] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -61,10 +57,6 @@ export default function ProfileAdminPage() {
     try {
       const profileData = await api.getMyProfile(token).catch(() => null);
       if (profileData) setProfile(profileData as Profile);
-
-      if (user?.username) {
-        setUsername(user.username);
-      }
     } catch (error) {
       console.error("Failed to load data:", error);
     } finally {
@@ -79,48 +71,10 @@ export default function ProfileAdminPage() {
     setSaving(true);
     try {
       await api.saveProfile(profile, token);
-      alert("Perfil salvo com sucesso!");
+      toast({ title: "Perfil salvo com sucesso!", variant: "success" });
     } catch (error) {
       console.error("Failed to save profile:", error);
-      alert("Erro ao salvar perfil");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const checkUsernameAvailability = async (value: string) => {
-    if (value.length < 3) {
-      setUsernameAvailable(null);
-      return;
-    }
-
-    const token = await getValidToken();
-    if (!token) return;
-
-    setCheckingUsername(true);
-    try {
-      const result = await api.checkUsername(value, token);
-      setUsernameAvailable(result.available);
-    } catch (error) {
-      setUsernameAvailable(null);
-    } finally {
-      setCheckingUsername(false);
-    }
-  };
-
-  const saveUsername = async () => {
-    const token = await getValidToken();
-    if (!token || !usernameAvailable) return;
-
-    setSaving(true);
-    try {
-      await api.updateUsername(username, token);
-      updateUser({ username });
-      setUsernameAvailable(null);
-      alert("Username atualizado!");
-    } catch (error) {
-      console.error("Failed to save username:", error);
-      alert("Erro ao salvar username");
+      toast({ title: "Erro ao salvar perfil", variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -129,9 +83,7 @@ export default function ProfileAdminPage() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
-        </div>
+        <ProfilePageSkeleton />
       </AdminLayout>
     );
   }
@@ -141,58 +93,10 @@ export default function ProfileAdminPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Perfil</h1>
-          <p className="text-muted-foreground">Gerencie suas informacoes pessoais</p>
+          <p className="text-muted-foreground">Gerencie suas informacoes do curriculo</p>
         </div>
 
         <div className="space-y-6">
-          {/* Username Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>URL do Portfolio</CardTitle>
-              <CardDescription>
-                Escolha um username unico para sua URL publica
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
-                <div className="flex-1">
-                  <Label>Username</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-muted-foreground text-sm sm:text-base">postangelo.com/u/</span>
-                    <div className="relative flex-1">
-                      <Input
-                        value={username}
-                        onChange={(e) => {
-                          const value = e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '');
-                          setUsername(value);
-                          checkUsernameAvailability(value);
-                        }}
-                        placeholder="seu-username"
-                        className="pr-10"
-                      />
-                      {checkingUsername && (
-                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
-                      )}
-                      {!checkingUsername && usernameAvailable === true && (
-                        <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-500" />
-                      )}
-                      {!checkingUsername && usernameAvailable === false && (
-                        <X className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-500" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <Button
-                  onClick={saveUsername}
-                  disabled={!usernameAvailable || saving}
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  Salvar
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Profile Info Card */}
           <Card>
             <CardHeader>

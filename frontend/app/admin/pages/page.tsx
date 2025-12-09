@@ -9,9 +9,10 @@ import { Plus, FileText, Edit, Trash2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { AdminLayout, TemplateSelectionDialog } from "@/components/admin";
+import { AdminLayout, TemplateSelectionDialog, PagesListSkeleton } from "@/components/admin";
 import { useAuthStore } from "@/lib/store";
 import { api, PageTemplate } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 interface Page {
   id: string;
@@ -132,13 +133,21 @@ export default function AdminPagesPage() {
       router.push(`/admin/pages/${(newPage as Page).id}`);
     } catch (error) {
       console.error("Failed to create page:", error);
-      alert("Erro ao criar projeto. Verifique se o slug ja existe.");
+      toast({ title: "Erro ao criar projeto", description: "Verifique se o slug ja existe.", variant: "destructive" });
     } finally {
       setCreating(false);
     }
   };
 
   if (!user) return null;
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <PagesListSkeleton />
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -169,12 +178,7 @@ export default function AdminPagesPage() {
         </div>
 
         {/* Pages List */}
-        {loading ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            Carregando...
-          </div>
-        ) : filteredPages.length === 0 ? (
+        {filteredPages.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
               <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

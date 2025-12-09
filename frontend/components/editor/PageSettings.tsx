@@ -24,6 +24,7 @@ import {
 import { useEditorStore, PageSettings as PageSettingsType } from "@/lib/store";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 interface PageSettingsProps {
   children: React.ReactNode;
@@ -61,14 +62,14 @@ export function PageSettings({ children }: PageSettingsProps) {
     try {
       const token = await getValidToken();
       if (!token) {
-        alert("Sessao expirada. Faca login novamente.");
+        toast({ title: "Sessao expirada", description: "Faca login novamente.", variant: "destructive" });
         return;
       }
       const result = await api.uploadFile(file, token) as { url: string };
       updateLocal("coverImage", result.url);
     } catch (error) {
       console.error("Upload failed:", error);
-      alert("Erro ao fazer upload da imagem");
+      toast({ title: "Erro ao fazer upload da imagem", variant: "destructive" });
     } finally {
       setUploading(false);
       if (coverImageInputRef.current) {

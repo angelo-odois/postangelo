@@ -71,6 +71,16 @@ export class Profile {
   @Column({ type: "varchar", length: 255, nullable: true })
   availabilityStatus?: string;
 
+  // Template/Theme
+  @Column({ type: "varchar", length: 50, default: "modern" })
+  template!: string;
+
+  @Column({ type: "varchar", length: 50, default: "amber" })
+  accentColor!: string;
+
+  @Column({ type: "varchar", length: 50, default: "inter" })
+  fontFamily!: string;
+
   // User relation
   @Column({ type: "uuid", name: "user_id" })
   userId!: string;

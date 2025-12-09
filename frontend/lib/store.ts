@@ -7,6 +7,8 @@ interface User {
   email: string;
   role: string;
   username?: string;
+  avatarUrl?: string;
+  onboardingCompleted?: boolean;
 }
 
 interface AuthState {
@@ -19,6 +21,7 @@ interface AuthState {
   logout: () => void;
   isTokenExpired: () => boolean;
   getValidToken: () => Promise<string | null>;
+  syncUser: () => Promise<void>;
 }
 
 // Helper to decode JWT and check expiration
@@ -86,6 +89,37 @@ export const useAuthStore = create<AuthState>()(
         } catch {
           logout();
           return null;
+        }
+      },
+      syncUser: async () => {
+        const { getValidToken, updateUser, logout } = get();
+        const token = await getValidToken();
+        if (!token) return;
+
+        try {
+          const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+          const response = await fetch(`${API_URL}/api/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              logout();
+            }
+            return;
+          }
+
+          const userData = await response.json();
+          updateUser({
+            name: userData.name,
+            email: userData.email,
+            role: userData.role,
+            username: userData.username,
+            avatarUrl: userData.avatarUrl,
+            onboardingCompleted: userData.onboardingCompleted,
+          });
+        } catch {
+          // Silently fail - user data sync is not critical
         }
       },
     }),

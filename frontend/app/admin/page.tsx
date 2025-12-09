@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
+import Link from "next/link";
 import { Lock, Mail, ArrowRight } from "lucide-react";
 
 export default function AdminLoginPage() {
@@ -20,10 +21,14 @@ export default function AdminLoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // If already logged in, redirect to dashboard
+  // If already logged in, redirect to dashboard or onboarding
   useEffect(() => {
     if (user) {
-      router.push("/admin/dashboard");
+      if (!user.onboardingCompleted) {
+        router.push("/admin/onboarding");
+      } else {
+        router.push("/admin/dashboard");
+      }
     }
   }, [user, router]);
 
@@ -38,12 +43,17 @@ export default function AdminLoginPage() {
 
     try {
       const response = await api.login(email, password);
+      const userData = response.user as any;
       setAuth(
-        response.user as any,
+        userData,
         response.accessToken,
         response.refreshToken
       );
-      router.push("/admin/dashboard");
+      if (!userData.onboardingCompleted) {
+        router.push("/admin/onboarding");
+      } else {
+        router.push("/admin/dashboard");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -186,7 +196,14 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-muted-foreground">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Nao tem uma conta?{" "}
+            <Link href="/admin/register" className="text-amber-500 hover:text-amber-600 font-medium">
+              Criar conta
+            </Link>
+          </p>
+
+          <p className="mt-4 text-center text-sm text-muted-foreground">
             Powered by{" "}
             <span className="font-semibold text-amber-500">Revuu</span>
           </p>
