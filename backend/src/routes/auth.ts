@@ -67,6 +67,7 @@ router.post(
         name: user.name,
         email: user.email,
         role: user.role,
+        username: user.username,
       },
     });
   })
@@ -142,7 +143,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const user = await userRepository().findOne({
       where: { id: req.user!.userId },
-      select: ["id", "name", "email", "role", "createdAt"],
+      select: ["id", "name", "email", "role", "username", "createdAt"],
     });
 
     if (!user) {

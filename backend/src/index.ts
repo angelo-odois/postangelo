@@ -4,15 +4,19 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import path from "path";
+import { fileURLToPath } from "url";
 import swaggerUi from "swagger-ui-express";
 import { AppDataSource } from "./data-source.js";
 import routes from "./routes/index.js";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
 import { swaggerSpec } from "./swagger.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 3001;
-const UPLOADS_PATH = process.env.UPLOADS_PATH || "/data/uploads";
+const UPLOADS_PATH = process.env.UPLOADS_PATH || path.resolve(__dirname, "..", "uploads");
 
 // Trust proxy for rate limiting behind reverse proxy (Coolify/Traefik)
 app.set("trust proxy", 1);

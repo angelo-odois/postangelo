@@ -20,10 +20,10 @@ export default function AdminLoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // If already logged in, redirect to pages
+  // If already logged in, redirect to dashboard
   useEffect(() => {
     if (user) {
-      router.push("/admin/pages");
+      router.push("/admin/dashboard");
     }
   }, [user, router]);
 
@@ -43,7 +43,7 @@ export default function AdminLoginPage() {
         response.accessToken,
         response.refreshToken
       );
-      router.push("/admin/pages");
+      router.push("/admin/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

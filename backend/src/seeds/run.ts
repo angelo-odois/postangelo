@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { AppDataSource } from "../data-source.js";
-import { User, UserRole, BlockTemplate, Page, PageStatus } from "../entities/index.js";
+import { User, UserRole, BlockTemplate, Page, PageStatus, PageTemplate, PageTemplateCategory } from "../entities/index.js";
 import { authService } from "../services/auth.js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -16,17 +16,25 @@ async function seed() {
     where: { email: "admin@postangelo.com" },
   });
 
+  const passwordHash = await authService.hashPassword("admin123");
+
   if (!existingAdmin) {
     const admin = userRepository.create({
       name: "Admin",
+      username: "admin",
       email: "admin@postangelo.com",
-      passwordHash: await authService.hashPassword("admin123"),
+      passwordHash,
       role: UserRole.ADMIN,
     });
     await userRepository.save(admin);
     console.log("Admin user created: admin@postangelo.com / admin123");
   } else {
-    console.log("Admin user already exists");
+    // Update password and username if admin already exists
+    await userRepository.update(existingAdmin.id, {
+      passwordHash,
+      username: existingAdmin.username || "admin",
+    });
+    console.log("Admin user password and username updated: admin@postangelo.com / admin123");
   }
 
   // Create default block templates
@@ -785,6 +793,254 @@ async function seed() {
       // Update existing page with new content
       await pageRepository.update(existing.id, pageData);
       console.log(`Project page updated: ${pageData.title}`);
+    }
+  }
+
+  // Create page templates
+  const pageTemplateRepository = AppDataSource.getRepository(PageTemplate);
+
+  const pageTemplates = [
+    {
+      name: "Curriculo Profissional",
+      description: "Template de curriculo moderno com secoes para experiencia, educacao e skills",
+      slug: "cv-professional",
+      category: PageTemplateCategory.CV,
+      thumbnailUrl: "/templates/cv-professional.png",
+      defaultTitle: "Meu Curriculo",
+      isPremium: false,
+      order: 1,
+      contentJSON: {
+        blocks: [
+          {
+            type: "hero",
+            id: uuidv4(),
+            props: {
+              title: "Seu Nome Aqui",
+              subtitle: "<p>Seu Cargo / Titulo Profissional</p>",
+              description: "Uma breve descricao sobre voce e suas habilidades principais.",
+              alignment: "center",
+              size: "medium",
+            },
+          },
+          {
+            type: "text",
+            id: uuidv4(),
+            props: {
+              content: `<h2>Sobre Mim</h2>
+<p>Escreva aqui uma descricao sobre sua trajetoria profissional, seus objetivos e o que voce pode oferecer. Este e o espaco para mostrar quem voce e como profissional.</p>`,
+              alignment: "left",
+            },
+          },
+          {
+            type: "timeline",
+            id: uuidv4(),
+            props: {
+              title: "Experiencia Profissional",
+              items: [
+                { title: "Cargo Atual", subtitle: "Empresa Atual", date: "2022 - Presente", description: "Descreva suas responsabilidades e conquistas nesta posicao." },
+                { title: "Cargo Anterior", subtitle: "Empresa Anterior", date: "2020 - 2022", description: "Descreva suas responsabilidades e conquistas nesta posicao." },
+                { title: "Primeiro Emprego", subtitle: "Primeira Empresa", date: "2018 - 2020", description: "Descreva suas responsabilidades e conquistas nesta posicao." },
+              ],
+              style: "alternating",
+            },
+          },
+          {
+            type: "timeline",
+            id: uuidv4(),
+            props: {
+              title: "Formacao Academica",
+              items: [
+                { title: "Pos-Graduacao", subtitle: "Universidade", date: "2020 - 2022", description: "Especializacao em sua area" },
+                { title: "Graduacao", subtitle: "Universidade", date: "2016 - 2020", description: "Curso de graduacao" },
+              ],
+              style: "left",
+            },
+          },
+          {
+            type: "features",
+            id: uuidv4(),
+            props: {
+              title: "Habilidades",
+              columns: "4",
+              style: "minimal",
+              features: [
+                { title: "Habilidade 1", description: "Descricao breve", icon: "code" },
+                { title: "Habilidade 2", description: "Descricao breve", icon: "palette" },
+                { title: "Habilidade 3", description: "Descricao breve", icon: "chart" },
+                { title: "Habilidade 4", description: "Descricao breve", icon: "users" },
+              ],
+            },
+          },
+          {
+            type: "cta",
+            id: uuidv4(),
+            props: {
+              title: "Vamos Conversar?",
+              description: "Entre em contato para oportunidades de trabalho",
+              buttonText: "Enviar Email",
+              buttonLink: "mailto:seu@email.com",
+              style: "gradient",
+            },
+          },
+        ],
+        meta: { theme: "default" },
+      },
+    },
+    {
+      name: "Landing Page Portfolio",
+      description: "Pagina inicial completa com hero, sobre, projetos e contato",
+      slug: "landing-portfolio",
+      category: PageTemplateCategory.LANDING,
+      thumbnailUrl: "/templates/landing-portfolio.png",
+      defaultTitle: "Meu Portfolio",
+      isPremium: false,
+      order: 2,
+      contentJSON: {
+        blocks: [
+          {
+            type: "hero",
+            id: uuidv4(),
+            props: {
+              title: "Ola, eu sou Seu Nome",
+              subtitle: "<p>Designer &amp; Desenvolvedor</p>",
+              description: "Crio experiencias digitais incriveis que conectam pessoas e marcas.",
+              alignment: "center",
+              size: "large",
+            },
+          },
+          {
+            type: "stats",
+            id: uuidv4(),
+            props: {
+              title: "",
+              columns: "4",
+              style: "minimal",
+              stats: [
+                { value: "5+", label: "Anos de Experiencia" },
+                { value: "50+", label: "Projetos Entregues" },
+                { value: "30+", label: "Clientes Felizes" },
+                { value: "100%", label: "Dedicacao" },
+              ],
+            },
+          },
+          {
+            type: "text",
+            id: uuidv4(),
+            props: {
+              content: `<h2>Sobre Mim</h2>
+<p>Sou um profissional apaixonado por criar solucoes digitais que fazem a diferenca. Com experiencia em design e desenvolvimento, busco sempre entregar projetos que superem as expectativas dos clientes.</p>`,
+              alignment: "center",
+            },
+          },
+          {
+            type: "features",
+            id: uuidv4(),
+            props: {
+              title: "O Que Eu Faco",
+              columns: "3",
+              style: "cards",
+              features: [
+                { title: "Design UI/UX", description: "Interfaces intuitivas e experiencias memoraveis", icon: "palette" },
+                { title: "Desenvolvimento Web", description: "Sites e aplicacoes modernas e performaticas", icon: "code" },
+                { title: "Consultoria", description: "Estrategias digitais para seu negocio", icon: "lightbulb" },
+              ],
+            },
+          },
+          {
+            type: "gallery",
+            id: uuidv4(),
+            props: {
+              title: "Projetos em Destaque",
+              columns: "3",
+              images: [
+                { url: "/placeholder-project-1.jpg", alt: "Projeto 1", caption: "Nome do Projeto 1" },
+                { url: "/placeholder-project-2.jpg", alt: "Projeto 2", caption: "Nome do Projeto 2" },
+                { url: "/placeholder-project-3.jpg", alt: "Projeto 3", caption: "Nome do Projeto 3" },
+              ],
+              style: "masonry",
+            },
+          },
+          {
+            type: "cta",
+            id: uuidv4(),
+            props: {
+              title: "Vamos Trabalhar Juntos?",
+              description: "Entre em contato para discutir seu proximo projeto",
+              buttonText: "Entrar em Contato",
+              buttonLink: "mailto:seu@email.com",
+              style: "gradient",
+            },
+          },
+        ],
+        meta: { theme: "default" },
+      },
+    },
+    {
+      name: "Pagina de Links",
+      description: "Estilo Linktree com bio e links para redes sociais",
+      slug: "links-bio",
+      category: PageTemplateCategory.LINKS,
+      thumbnailUrl: "/templates/links-bio.png",
+      defaultTitle: "Meus Links",
+      isPremium: false,
+      order: 3,
+      contentJSON: {
+        blocks: [
+          {
+            type: "hero",
+            id: uuidv4(),
+            props: {
+              title: "@seunome",
+              subtitle: "<p>Criador de Conteudo | Designer | Dev</p>",
+              description: "Acompanhe meu trabalho nas redes sociais",
+              alignment: "center",
+              size: "small",
+            },
+          },
+          {
+            type: "features",
+            id: uuidv4(),
+            props: {
+              title: "",
+              columns: "1",
+              style: "list",
+              features: [
+                { title: "Meu Portfolio", description: "Veja meus projetos", icon: "globe" },
+                { title: "LinkedIn", description: "Conecte-se comigo", icon: "linkedin" },
+                { title: "GitHub", description: "Meus repositorios", icon: "github" },
+                { title: "Instagram", description: "Siga-me", icon: "instagram" },
+                { title: "YouTube", description: "Meu canal", icon: "play" },
+                { title: "Email", description: "Entre em contato", icon: "mail" },
+              ],
+            },
+          },
+          {
+            type: "text",
+            id: uuidv4(),
+            props: {
+              content: "<p style=\"text-align: center; font-size: 0.875rem; color: #666;\">Feito com Revuu</p>",
+              alignment: "center",
+            },
+          },
+        ],
+        meta: { theme: "default", layout: "centered" },
+      },
+    },
+  ];
+
+  for (const template of pageTemplates) {
+    const existing = await pageTemplateRepository.findOne({
+      where: { slug: template.slug },
+    });
+
+    if (!existing) {
+      const newTemplate = pageTemplateRepository.create(template as unknown as Partial<PageTemplate>);
+      await pageTemplateRepository.save(newTemplate);
+      console.log(`Page template created: ${template.name}`);
+    } else {
+      // Update existing template with new content
+      await pageTemplateRepository.update(existing.id, template);
+      console.log(`Page template updated: ${template.name}`);
     }
   }
 

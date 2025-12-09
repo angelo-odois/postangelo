@@ -1,15 +1,16 @@
 {
-  "name": "postangelo",
+  "name": "revuu",
   "version": "1.0.0",
   "private": true,
-  "description": "Portfolio + CMS with visual block editor",
+  "description": "Revuu - Portfolio platform for professionals",
   "scripts": {
     "dev": "pnpm -r --parallel dev",
-    "dev:backend": "pnpm --filter backend dev",
-    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter @revuu/backend dev",
+    "dev:frontend": "pnpm --filter @revuu/frontend dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "seed": "pnpm --filter @revuu/backend seed"
   },
   "keywords": ["portfolio", "cms", "block-editor"],
   "author": "Angelo",

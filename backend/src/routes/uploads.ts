@@ -1,6 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
 import fs from "fs/promises";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
@@ -11,11 +12,14 @@ import { authenticate, requireRole } from "../middlewares/auth.js";
 import { UserRole } from "../entities/index.js";
 import rateLimit from "express-rate-limit";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const router: ReturnType<typeof Router> = Router();
 const assetRepository = () => AppDataSource.getRepository(Asset);
 
-const UPLOADS_PATH = process.env.UPLOADS_PATH || "/data/uploads";
-const API_BASE_URL = process.env.API_BASE_URL || ""; // e.g., https://studio.odois.com.br
+const UPLOADS_PATH = process.env.UPLOADS_PATH || path.resolve(__dirname, "..", "..", "uploads");
+const API_BASE_URL = process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 3001}`;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_MIMES = [
   "image/jpeg",

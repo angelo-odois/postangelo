@@ -3,3 +3,9 @@ export { Page, PageStatus, type ContentJSON, type BlockContent } from "./Page.js
 export { BlockTemplate, type BlockSchema } from "./BlockTemplate.js";
 export { Asset } from "./Asset.js";
 export { Setting } from "./Setting.js";
+export { Profile } from "./Profile.js";
+export { Experience } from "./Experience.js";
+export { Education } from "./Education.js";
+export { Skill, SkillCategory, SkillLevel } from "./Skill.js";
+export { Project, ProjectStatus } from "./Project.js";
+export { PageTemplate, PageTemplateCategory } from "./PageTemplate.js";

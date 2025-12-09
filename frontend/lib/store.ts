@@ -6,6 +6,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  username?: string;
 }
 
 interface AuthState {
@@ -14,6 +15,7 @@ interface AuthState {
   refreshToken: string | null;
   setAuth: (user: User, accessToken: string, refreshToken: string) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
+  updateUser: (updates: Partial<User>) => void;
   logout: () => void;
   isTokenExpired: () => boolean;
   getValidToken: () => Promise<string | null>;
@@ -40,6 +42,12 @@ export const useAuthStore = create<AuthState>()(
         set({ user, accessToken, refreshToken }),
       setTokens: (accessToken, refreshToken) =>
         set({ accessToken, refreshToken }),
+      updateUser: (updates) => {
+        const { user } = get();
+        if (user) {
+          set({ user: { ...user, ...updates } });
+        }
+      },
       logout: () => set({ user: null, accessToken: null, refreshToken: null }),
       isTokenExpired: () => {
         const { accessToken } = get();

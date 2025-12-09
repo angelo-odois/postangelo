@@ -59,3 +59,5 @@ export function optionalAuth(req: Request, res: Response, next: NextFunction): v
 
   next();
 }
+
+export const requireAdmin = requireRole(UserRole.ADMIN);

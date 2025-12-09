@@ -155,6 +155,7 @@ router.post(
 
     await pageRepository().save(page);
     await cache.invalidatePattern("pages:*");
+    await cache.invalidatePattern("portfolio:*");
 
     res.status(201).json(page);
   })
@@ -202,6 +203,7 @@ router.put(
     await pageRepository().save(page);
     await cache.del(`page:${page.slug}`);
     await cache.invalidatePattern("pages:*");
+    await cache.invalidatePattern("portfolio:*");
 
     res.json(page);
   })
@@ -231,6 +233,7 @@ router.delete(
     await cache.del(`page:${page.slug}`);
     await pageRepository().remove(page);
     await cache.invalidatePattern("pages:*");
+    await cache.invalidatePattern("portfolio:*");
 
     res.json({ message: "Page deleted successfully" });
   })

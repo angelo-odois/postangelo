@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 interface ProfileImageProps {
-  src: string;
+  src?: string;
   alt: string;
   initials: string;
   size?: "sm" | "lg";
@@ -15,10 +15,11 @@ export function ProfileImage({ src, alt, initials, size = "lg", className = "" }
   const [hasError, setHasError] = useState(false);
 
   const textSize = size === "lg" ? "text-6xl" : "text-2xl";
+  const showImage = src && !hasError;
 
   return (
     <>
-      {!hasError && (
+      {showImage && (
         <Image
           src={src}
           alt={alt}
@@ -30,7 +31,7 @@ export function ProfileImage({ src, alt, initials, size = "lg", className = "" }
           onError={() => setHasError(true)}
         />
       )}
-      <span className={`text-white ${textSize} font-bold select-none ${hasError ? "" : "absolute"}`}>
+      <span className={`text-white ${textSize} font-bold select-none ${showImage ? "absolute" : ""}`}>
         {initials}
       </span>
     </>
