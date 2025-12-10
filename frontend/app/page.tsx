@@ -8,6 +8,7 @@ import {
   CheckCircle2, ArrowRight, Award,
   Heart, Layers, BarChart3, Phone
 } from "lucide-react";
+import { getServerApiUrl } from "@/lib/server-api";
 
 interface PageItem {
   id: string;
@@ -20,8 +21,7 @@ interface PageItem {
 
 async function getPages(): Promise<PageItem[]> {
   try {
-    // For SSR, use internal API URL (server-to-server communication)
-    const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    const API_URL = getServerApiUrl();
     const res = await fetch(
       `${API_URL}/api/pages`,
       { next: { revalidate: 60 } }

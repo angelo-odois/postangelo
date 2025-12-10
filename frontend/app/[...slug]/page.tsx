@@ -5,6 +5,7 @@ import { BlockRenderer } from "@/components/blocks/BlockRenderer";
 import { ViewTracker } from "@/components/ViewTracker";
 import { cn } from "@/lib/utils";
 import { Home } from "lucide-react";
+import { getServerApiUrl } from "@/lib/server-api";
 
 interface PageData {
   id: string;
@@ -33,8 +34,7 @@ interface PageData {
 
 async function getPage(slug: string): Promise<PageData | null> {
   try {
-    // For SSR, use internal API URL (server-to-server communication)
-    const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    const API_URL = getServerApiUrl();
     const res = await fetch(
       `${API_URL}/api/pages/${encodeURIComponent(slug)}`,
       { next: { revalidate: 60 } }

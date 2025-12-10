@@ -5,6 +5,7 @@ import {
   getTemplateComponent,
   type PortfolioData,
 } from "@/components/portfolio-templates";
+import { getServerApiUrl } from "@/lib/server-api";
 
 interface PageProps {
   params: Promise<{ username: string }>;
@@ -18,9 +19,7 @@ interface PageProps {
 
 async function getPortfolio(username: string): Promise<PortfolioData | null> {
   try {
-    // For SSR, use internal API URL (server-to-server communication)
-    // Falls back to NEXT_PUBLIC_API_URL or localhost for development
-    const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    const API_URL = getServerApiUrl();
     const response = await fetch(`${API_URL}/api/portfolio/${username}`, {
       cache: "no-store",
     });
