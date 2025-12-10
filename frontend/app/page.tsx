@@ -640,10 +640,10 @@ export default function HomePage() {
             <div>
               <h4 className="font-bold mb-4">Suporte</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground transition-colors">Central de Ajuda</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Contato</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Termos de Uso</Link></li>
-                <li><Link href="#" className="hover:text-foreground transition-colors">Privacidade</Link></li>
+                <li><Link href="/ajuda" className="hover:text-foreground transition-colors">Central de Ajuda</Link></li>
+                <li><Link href="/contato" className="hover:text-foreground transition-colors">Contato</Link></li>
+                <li><Link href="/termos" className="hover:text-foreground transition-colors">Termos de Uso</Link></li>
+                <li><Link href="/privacidade" className="hover:text-foreground transition-colors">Privacidade</Link></li>
               </ul>
             </div>
           </div>
