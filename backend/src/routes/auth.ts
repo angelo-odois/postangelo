@@ -2,9 +2,10 @@ import { Router } from "express";
 import { AppDataSource } from "../data-source.js";
 import { User } from "../entities/index.js";
 import { authService } from "../services/auth.js";
-import { asyncHandler, AppError } from "../middlewares/errorHandler.js";
+import { asyncHandler, Errors } from "../middlewares/errorHandler.js";
 import { authenticate } from "../middlewares/auth.js";
 import rateLimit from "express-rate-limit";
+import { ErrorCodes } from "../errors/codes.js";
 
 const router: ReturnType<typeof Router> = Router();
 const userRepository = () => AppDataSource.getRepository(User);
@@ -12,7 +13,16 @@ const userRepository = () => AppDataSource.getRepository(User);
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
-  message: { error: "Too many login attempts, please try again later" },
+  handler: (_req, res) => {
+    const error = ErrorCodes.SYSTEM_RATE_LIMITED;
+    res.status(error.status).json({
+      error: {
+        code: error.code,
+        message: "Muitas tentativas de login. Tente novamente em 15 minutos.",
+        timestamp: new Date().toISOString(),
+      },
+    });
+  },
 });
 
 /**
@@ -46,33 +56,33 @@ router.post(
     const { name, email, password, username } = req.body;
 
     if (!name || !email || !password || !username) {
-      throw new AppError("Nome, email, senha e username são obrigatórios", 400);
+      throw Errors.requiredField("nome, email, senha e username");
     }
 
     if (password.length < 6) {
-      throw new AppError("A senha deve ter pelo menos 6 caracteres", 400);
+      throw Errors.stringTooLong("senha", 6);
     }
 
     // Validate username format (alphanumeric and hyphens only)
     const usernameRegex = /^[a-zA-Z0-9-]+$/;
     if (!usernameRegex.test(username)) {
-      throw new AppError("Username deve conter apenas letras, números e hífens", 400);
+      throw Errors.invalidFormat("username", "apenas letras, numeros e hifens");
     }
 
     if (username.length < 3 || username.length > 30) {
-      throw new AppError("Username deve ter entre 3 e 30 caracteres", 400);
+      throw Errors.invalidFormat("username", "entre 3 e 30 caracteres");
     }
 
     // Check if email already exists
     const existingEmail = await userRepository().findOne({ where: { email } });
     if (existingEmail) {
-      throw new AppError("Este email já está em uso", 409);
+      throw Errors.emailTaken(email);
     }
 
     // Check if username already exists
     const existingUsername = await userRepository().findOne({ where: { username } });
     if (existingUsername) {
-      throw new AppError("Este username já está em uso", 409);
+      throw Errors.usernameTaken(username);
     }
 
     // Create new user
@@ -134,19 +144,19 @@ router.post(
     const { email, password } = req.body;
 
     if (!email || !password) {
-      throw new AppError("Email and password are required", 400);
+      throw Errors.requiredField("email e senha");
     }
 
     const user = await userRepository().findOne({ where: { email } });
 
     if (!user) {
-      throw new AppError("Invalid credentials", 401);
+      throw Errors.invalidCredentials();
     }
 
     const isValid = await authService.verifyPassword(password, user.passwordHash);
 
     if (!isValid) {
-      throw new AppError("Invalid credentials", 401);
+      throw Errors.invalidCredentials();
     }
 
     const tokens = await authService.generateTokens(user);
@@ -181,19 +191,19 @@ router.post(
     const { refreshToken, userId } = req.body;
 
     if (!refreshToken || !userId) {
-      throw new AppError("Refresh token and userId are required", 400);
+      throw Errors.requiredField("refreshToken e userId");
     }
 
     const isValid = await authService.verifyRefreshToken(userId, refreshToken);
 
     if (!isValid) {
-      throw new AppError("Invalid refresh token", 401);
+      throw Errors.tokenInvalid();
     }
 
     const user = await userRepository().findOne({ where: { id: userId } });
 
     if (!user) {
-      throw new AppError("User not found", 404);
+      throw Errors.userNotFound(userId);
     }
 
     // Revoke old token and generate new ones
@@ -221,7 +231,7 @@ router.post(
       await authService.revokeRefreshToken(req.user.userId, refreshToken);
     }
 
-    res.json({ message: "Logged out successfully" });
+    res.json({ message: "Logout realizado com sucesso" });
   })
 );
 
@@ -242,7 +252,7 @@ router.get(
     });
 
     if (!user) {
-      throw new AppError("User not found", 404);
+      throw Errors.userNotFound(req.user!.userId);
     }
 
     res.json(user);
@@ -263,11 +273,11 @@ router.post(
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
-      throw new AppError("Senha atual e nova senha sao obrigatorias", 400);
+      throw Errors.requiredField("senha atual e nova senha");
     }
 
     if (newPassword.length < 6) {
-      throw new AppError("A nova senha deve ter pelo menos 6 caracteres", 400);
+      throw Errors.invalidFormat("nova senha", "minimo 6 caracteres");
     }
 
     const user = await userRepository().findOne({
@@ -275,13 +285,13 @@ router.post(
     });
 
     if (!user) {
-      throw new AppError("Usuario nao encontrado", 404);
+      throw Errors.userNotFound(req.user!.userId);
     }
 
     const isValid = await authService.verifyPassword(currentPassword, user.passwordHash);
 
     if (!isValid) {
-      throw new AppError("Senha atual incorreta", 401);
+      throw Errors.invalidCredentials({ reason: "senha atual incorreta" });
     }
 
     user.passwordHash = await authService.hashPassword(newPassword);
@@ -309,7 +319,7 @@ router.put(
     });
 
     if (!user) {
-      throw new AppError("Usuario nao encontrado", 404);
+      throw Errors.userNotFound(req.user!.userId);
     }
 
     user.avatarUrl = avatarUrl || null;
@@ -335,7 +345,7 @@ router.post(
     });
 
     if (!user) {
-      throw new AppError("Usuario nao encontrado", 404);
+      throw Errors.userNotFound(req.user!.userId);
     }
 
     user.onboardingCompleted = true;
@@ -360,7 +370,7 @@ router.delete(
     const userId = req.user!.userId;
 
     if (!password) {
-      throw new AppError("Senha é obrigatória para excluir a conta", 400);
+      throw Errors.requiredField("senha");
     }
 
     const user = await userRepository().findOne({
@@ -368,13 +378,13 @@ router.delete(
     });
 
     if (!user) {
-      throw new AppError("Usuario nao encontrado", 404);
+      throw Errors.userNotFound(userId);
     }
 
     // Verify password before deletion
     const isValid = await authService.verifyPassword(password, user.passwordHash);
     if (!isValid) {
-      throw new AppError("Senha incorreta", 401);
+      throw Errors.invalidCredentials({ reason: "senha incorreta" });
     }
 
     // Delete all user data (cascade should handle most, but let's be explicit)
@@ -400,7 +410,7 @@ router.delete(
     // Revoke all refresh tokens
     await authService.revokeAllRefreshTokens(userId);
 
-    res.json({ message: "Conta excluída com sucesso" });
+    res.json({ message: "Conta excluida com sucesso" });
   })
 );
 

@@ -40,9 +40,13 @@ function parseExpiresIn(expiresIn: string): number {
   }
 }
 
+// Bcrypt cost factor: 10 is a good balance between security and performance
+// Cost 10 = ~100ms, Cost 12 = ~400ms on typical server
+const BCRYPT_COST = 10;
+
 export const authService = {
   async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 12);
+    return bcrypt.hash(password, BCRYPT_COST);
   },
 
   async verifyPassword(password: string, hash: string): Promise<boolean> {

@@ -1,11 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { authService, TokenPayload } from "../services/auth.js";
 import { UserRole } from "../entities/index.js";
+import { Errors } from "./errorHandler.js";
 
 declare global {
   namespace Express {
     interface Request {
       user?: TokenPayload;
+      requestId?: string;
     }
   }
 }
@@ -14,7 +16,14 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
-    res.status(401).json({ error: "Unauthorized: No token provided" });
+    const error = Errors.tokenMissing();
+    res.status(error.statusCode).json({
+      error: {
+        code: error.code,
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      },
+    });
     return;
   }
 
@@ -22,7 +31,14 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
   const payload = authService.verifyAccessToken(token);
 
   if (!payload) {
-    res.status(401).json({ error: "Unauthorized: Invalid token" });
+    const error = Errors.tokenInvalid();
+    res.status(error.statusCode).json({
+      error: {
+        code: error.code,
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      },
+    });
     return;
   }
 
@@ -33,12 +49,26 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
 export function requireRole(...roles: UserRole[]) {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
-      res.status(401).json({ error: "Unauthorized" });
+      const error = Errors.tokenMissing();
+      res.status(error.statusCode).json({
+        error: {
+          code: error.code,
+          message: error.message,
+          timestamp: new Date().toISOString(),
+        },
+      });
       return;
     }
 
     if (!roles.includes(req.user.role)) {
-      res.status(403).json({ error: "Forbidden: Insufficient permissions" });
+      const error = Errors.adminRequired();
+      res.status(error.statusCode).json({
+        error: {
+          code: error.code,
+          message: error.message,
+          timestamp: new Date().toISOString(),
+        },
+      });
       return;
     }
 

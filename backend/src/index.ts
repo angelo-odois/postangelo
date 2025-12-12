@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 import swaggerUi from "swagger-ui-express";
 import { AppDataSource } from "./data-source.js";
 import routes from "./routes/index.js";
-import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
+import { errorHandler, notFoundHandler, requestIdMiddleware } from "./middlewares/errorHandler.js";
 import { swaggerSpec } from "./swagger.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -44,6 +44,9 @@ app.use(cors({
   },
   credentials: true,
 }));
+
+// Request ID middleware for error tracking
+app.use(requestIdMiddleware);
 
 // Body parsing
 app.use(express.json({ limit: "10mb" }));
