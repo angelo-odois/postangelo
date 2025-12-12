@@ -27,6 +27,9 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
+# Install curl for health check
+RUN apk add --no-cache curl
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@9 --activate
 
