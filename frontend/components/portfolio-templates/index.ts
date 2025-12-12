@@ -4,6 +4,7 @@ export { ClassicTemplate } from "./ClassicTemplate";
 export { BentoTemplate } from "./BentoTemplate";
 export { TerminalTemplate } from "./TerminalTemplate";
 export { GradientTemplate } from "./GradientTemplate";
+export { ContactForm } from "./ContactForm";
 export {
   type PortfolioData,
   type TemplateProps,

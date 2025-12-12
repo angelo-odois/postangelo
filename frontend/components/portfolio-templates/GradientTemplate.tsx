@@ -6,7 +6,7 @@ import { RevuuLogo } from "@/components/RevuuLogo";
 import {
   MapPin, Mail, Phone, ExternalLink, Github, Linkedin, Twitter, Globe,
   Briefcase, GraduationCap, Instagram, Youtube, Dribbble, Palette,
-  ArrowRight, Sparkles, Star,
+  ArrowRight, Sparkles, Star, Download,
 } from "lucide-react";
 import { TemplateProps, getAccentClasses, getFontClass } from "./types";
 
@@ -18,7 +18,8 @@ function formatPeriod(startDate: string, endDate?: string, isCurrent?: boolean):
 }
 
 export function GradientTemplate({ portfolio, accentColor = "violet", fontFamily = "inter" }: TemplateProps) {
-  const { user, profile, experiences, educations, skills, projects, pages = [] } = portfolio;
+  const { user, profile, experiences, educations, skills, projects, pages = [], planFeatures } = portfolio;
+  const showBranding = planFeatures?.showBranding !== false;
   const colors = getAccentClasses(accentColor);
   const fontClass = getFontClass(fontFamily);
 
@@ -55,22 +56,38 @@ export function GradientTemplate({ portfolio, accentColor = "violet", fontFamily
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/">
-            <RevuuLogo className="h-7 w-auto" accentColor={accentColor} />
-          </Link>
+          {showBranding ? (
+            <Link href="/">
+              <RevuuLogo className="h-7 w-auto" accentColor={accentColor} />
+            </Link>
+          ) : (
+            <span className="text-white font-semibold">{profile?.fullName || user.name}</span>
+          )}
           <nav className="hidden md:flex items-center gap-6 px-6 py-2 rounded-full bg-white/5 backdrop-blur-xl border border-white/10">
             {skills.length > 0 && <a href="#skills" className="text-sm text-zinc-400 hover:text-white transition-colors">Skills</a>}
             {experiences.length > 0 && <a href="#experiencia" className="text-sm text-zinc-400 hover:text-white transition-colors">Experiencia</a>}
             {(projects.length > 0 || pages.length > 0) && <a href="#projetos" className="text-sm text-zinc-400 hover:text-white transition-colors">Projetos</a>}
           </nav>
-          {profile?.contactEmail && (
-            <a
-              href={`mailto:${profile.contactEmail}`}
-              className={`text-sm px-5 py-2 bg-gradient-to-r ${colors.gradient} rounded-full font-medium hover:shadow-lg hover:shadow-${accentColor}-500/25 transition-all`}
-            >
-              Contato
-            </a>
-          )}
+          <div className="flex items-center gap-3">
+            {planFeatures?.hasExportPdf && (
+              <button
+                onClick={() => window.print()}
+                className="text-sm px-4 py-2 rounded-full border border-white/20 text-white hover:bg-white/10 transition-all print:hidden flex items-center gap-2"
+                title="Exportar como PDF"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">PDF</span>
+              </button>
+            )}
+            {profile?.contactEmail && (
+              <a
+                href={`mailto:${profile.contactEmail}`}
+                className={`text-sm px-5 py-2 bg-gradient-to-r ${colors.gradient} rounded-full font-medium hover:shadow-lg hover:shadow-${accentColor}-500/25 transition-all`}
+              >
+                Contato
+              </a>
+            )}
+          </div>
         </div>
       </header>
 
@@ -358,10 +375,18 @@ export function GradientTemplate({ portfolio, accentColor = "violet", fontFamily
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-white/10">
         <div className="max-w-5xl mx-auto flex flex-col items-center">
-          <RevuuLogo className="h-8 w-auto mb-4 opacity-70" accentColor={accentColor} />
-          <p className="text-zinc-500 text-sm">
-            Criado com <Link href="/admin" className={`${colors.text} hover:underline`}>Revuu</Link>
-          </p>
+          {showBranding ? (
+            <>
+              <RevuuLogo className="h-8 w-auto mb-4 opacity-70" accentColor={accentColor} />
+              <p className="text-zinc-500 text-sm">
+                Criado com <Link href="/admin" className={`${colors.text} hover:underline`}>Revuu</Link>
+              </p>
+            </>
+          ) : (
+            <p className="text-zinc-500 text-sm">
+              © {new Date().getFullYear()} {profile?.fullName || user.name}
+            </p>
+          )}
         </div>
       </footer>
 

@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   BarChart3,
   Eye,
@@ -19,6 +20,8 @@ import {
   ArrowDown,
   ExternalLink,
   RefreshCw,
+  Lock,
+  Crown,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -105,6 +108,24 @@ export default function AnalyticsPage() {
 
   // Calculate total views from chart data
   const totalChartViews = chartData.reduce((sum, d) => sum + d.views, 0);
+
+  // Check if user has advanced analytics
+  const userPlan = user?.plan || "free";
+  const hasAdvancedAnalytics = userPlan === "pro" || userPlan === "business";
+
+  // Upgrade prompt component for locked sections
+  const UpgradeOverlay = ({ title }: { title: string }) => (
+    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 rounded-lg z-10">
+      <Lock className="h-8 w-8 text-muted-foreground" />
+      <p className="text-sm text-muted-foreground text-center px-4">{title}</p>
+      <Link href="/admin/subscription">
+        <Button size="sm" className="gap-2">
+          <Crown className="h-4 w-4" />
+          Fazer Upgrade
+        </Button>
+      </Link>
+    </div>
+  );
 
   // Format date for chart labels
   const formatChartDate = (dateStr: string) => {
@@ -223,7 +244,10 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Chart */}
-        <Card>
+        <Card className="relative">
+          {!hasAdvancedAnalytics && (
+            <UpgradeOverlay title="Grafico de visualizacoes disponivel no plano PRO" />
+          )}
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-amber-500" />
@@ -276,7 +300,10 @@ export default function AnalyticsPage() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Device Stats */}
-          <Card>
+          <Card className="relative">
+            {!hasAdvancedAnalytics && (
+              <UpgradeOverlay title="Dados de dispositivos disponiveis no plano PRO" />
+            )}
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Monitor className="h-5 w-5 text-blue-500" />
@@ -328,7 +355,10 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* Browser Stats */}
-          <Card>
+          <Card className="relative">
+            {!hasAdvancedAnalytics && (
+              <UpgradeOverlay title="Dados de navegadores disponiveis no plano PRO" />
+            )}
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5 text-green-500" />
@@ -376,7 +406,10 @@ export default function AnalyticsPage() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Top Pages */}
-          <Card>
+          <Card className="relative">
+            {!hasAdvancedAnalytics && (
+              <UpgradeOverlay title="Top paginas disponiveis no plano PRO" />
+            )}
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-purple-500" />
@@ -419,7 +452,10 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* Top Referrers */}
-          <Card>
+          <Card className="relative">
+            {!hasAdvancedAnalytics && (
+              <UpgradeOverlay title="Origens de trafego disponiveis no plano PRO" />
+            )}
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ExternalLink className="h-5 w-5 text-orange-500" />

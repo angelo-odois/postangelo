@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ProfileImage } from "@/components/ProfileImage";
 import { RevuuLogo } from "@/components/RevuuLogo";
 import {
-  MapPin, Mail, ExternalLink, Github, Linkedin, Globe, ChevronRight,
+  MapPin, Mail, ExternalLink, Github, Linkedin, Globe, ChevronRight, Download,
 } from "lucide-react";
 import { TemplateProps, getAccentClasses } from "./types";
 
@@ -14,7 +14,8 @@ function formatDate(dateString: string): string {
 }
 
 export function TerminalTemplate({ portfolio, accentColor = "emerald" }: TemplateProps) {
-  const { user, profile, experiences, educations, skills, projects, pages = [] } = portfolio;
+  const { user, profile, experiences, educations, skills, projects, pages = [], planFeatures } = portfolio;
+  const showBranding = planFeatures?.showBranding !== false;
   const colors = getAccentClasses(accentColor);
 
   const name = profile?.fullName || user.name;
@@ -33,13 +34,25 @@ export function TerminalTemplate({ portfolio, accentColor = "emerald" }: Templat
       {/* Terminal Window */}
       <div className="max-w-4xl mx-auto p-4">
         {/* Window Chrome */}
-        <div className="rounded-t-lg bg-zinc-800 px-4 py-2 flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
+        <div className="rounded-t-lg bg-zinc-800 px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-red-500" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500" />
+              <div className="w-3 h-3 rounded-full bg-green-500" />
+            </div>
+            <span className="text-xs text-zinc-500 ml-2">~/{username}/portfolio</span>
           </div>
-          <span className="text-xs text-zinc-500 ml-2">~/{username}/portfolio</span>
+          {planFeatures?.hasExportPdf && (
+            <button
+              onClick={() => window.print()}
+              className="text-xs px-2 py-1 rounded bg-zinc-700 text-zinc-400 hover:bg-zinc-600 hover:text-white transition-all print:hidden flex items-center gap-1"
+              title="Exportar como PDF"
+            >
+              <Download className="h-3 w-3" />
+              <span className="hidden sm:inline">export</span>
+            </button>
+          )}
         </div>
 
         {/* Terminal Content */}
@@ -249,10 +262,16 @@ export function TerminalTemplate({ portfolio, accentColor = "emerald" }: Templat
 
         {/* Footer */}
         <footer className="mt-8 flex items-center justify-between text-xs text-zinc-600">
-          <p>
-            powered_by <Link href="/admin" className={`${colors.text} hover:underline`}>revuu</Link>
-          </p>
-          <RevuuLogo className="h-4 w-auto opacity-30" accentColor={accentColor} />
+          {showBranding ? (
+            <>
+              <p>
+                powered_by <Link href="/admin" className={`${colors.text} hover:underline`}>revuu</Link>
+              </p>
+              <RevuuLogo className="h-4 w-auto opacity-30" accentColor={accentColor} />
+            </>
+          ) : (
+            <p className="w-full text-center">© {new Date().getFullYear()} {profile?.fullName || user.name}</p>
+          )}
         </footer>
       </div>
     </main>

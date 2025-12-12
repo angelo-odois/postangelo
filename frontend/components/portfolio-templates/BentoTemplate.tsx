@@ -6,7 +6,7 @@ import { RevuuLogo } from "@/components/RevuuLogo";
 import {
   MapPin, Mail, Phone, ExternalLink, Github, Linkedin, Twitter, Globe,
   Briefcase, GraduationCap, Instagram, Youtube, Dribbble, Palette,
-  ArrowUpRight, ChevronDown,
+  ArrowUpRight, ChevronDown, Download,
 } from "lucide-react";
 import { TemplateProps, getAccentClasses, getFontClass } from "./types";
 
@@ -18,7 +18,8 @@ function formatPeriod(startDate: string, endDate?: string, isCurrent?: boolean):
 }
 
 export function BentoTemplate({ portfolio, accentColor = "amber", fontFamily = "inter" }: TemplateProps) {
-  const { user, profile, experiences, educations, skills, projects, pages = [] } = portfolio;
+  const { user, profile, experiences, educations, skills, projects, pages = [], planFeatures } = portfolio;
+  const showBranding = planFeatures?.showBranding !== false;
   const colors = getAccentClasses(accentColor);
   const fontClass = getFontClass(fontFamily);
 
@@ -49,11 +50,25 @@ export function BentoTemplate({ portfolio, accentColor = "amber", fontFamily = "
         {/* Left Panel - Fixed */}
         <div className="lg:w-[420px] lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:overflow-hidden flex-shrink-0">
           <div className={`h-full bg-gradient-to-br ${colors.gradient} p-8 lg:p-12 flex flex-col`}>
-            {/* Logo */}
-            <div className="mb-auto">
-              <Link href="/">
-                <RevuuLogo className="h-6 w-auto text-white/80 hover:text-white transition-colors" />
-              </Link>
+            {/* Logo & Actions */}
+            <div className="mb-auto flex items-center justify-between">
+              {showBranding ? (
+                <Link href="/">
+                  <RevuuLogo className="h-6 w-auto text-white/80 hover:text-white transition-colors" />
+                </Link>
+              ) : (
+                <span className="text-white/80 font-semibold">{profile?.fullName || user.name}</span>
+              )}
+              {planFeatures?.hasExportPdf && (
+                <button
+                  onClick={() => window.print()}
+                  className="text-sm px-3 py-1.5 rounded-lg bg-white/10 text-white/80 hover:bg-white/20 hover:text-white transition-all print:hidden flex items-center gap-1.5"
+                  title="Exportar como PDF"
+                >
+                  <Download className="h-4 w-4" />
+                  <span className="hidden sm:inline">PDF</span>
+                </button>
+              )}
             </div>
 
             {/* Profile */}
@@ -121,11 +136,13 @@ export function BentoTemplate({ portfolio, accentColor = "amber", fontFamily = "
             </div>
 
             {/* Footer */}
-            <div className="mt-auto pt-8 hidden lg:block">
-              <p className="text-white/40 text-xs">
-                Feito com Revuu
-              </p>
-            </div>
+            {showBranding && (
+              <div className="mt-auto pt-8 hidden lg:block">
+                <p className="text-white/40 text-xs">
+                  Feito com Revuu
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -348,10 +365,18 @@ export function BentoTemplate({ portfolio, accentColor = "amber", fontFamily = "
             {/* Footer */}
             <footer className="pt-8 border-t border-zinc-800">
               <div className="flex items-center justify-between">
-                <p className="text-zinc-600 text-sm">
-                  Criado com <Link href="/admin" className={`${colors.text} hover:underline`}>Revuu</Link>
-                </p>
-                <RevuuLogo className="h-4 w-auto opacity-30" accentColor={accentColor} />
+                {showBranding ? (
+                  <>
+                    <p className="text-zinc-600 text-sm">
+                      Criado com <Link href="/admin" className={`${colors.text} hover:underline`}>Revuu</Link>
+                    </p>
+                    <RevuuLogo className="h-4 w-auto opacity-30" accentColor={accentColor} />
+                  </>
+                ) : (
+                  <p className="text-zinc-600 text-sm w-full text-center">
+                    © {new Date().getFullYear()} {profile?.fullName || user.name}
+                  </p>
+                )}
               </div>
             </footer>
           </div>

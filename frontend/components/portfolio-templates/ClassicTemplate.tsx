@@ -22,7 +22,8 @@ function formatDateRange(startDate: string, endDate?: string, isCurrent?: boolea
 }
 
 export function ClassicTemplate({ portfolio, accentColor = "amber", fontFamily = "inter" }: TemplateProps) {
-  const { user, profile, experiences, educations, skills, projects, pages = [] } = portfolio;
+  const { user, profile, experiences, educations, skills, projects, pages = [], planFeatures } = portfolio;
+  const showBranding = planFeatures?.showBranding !== false;
   const colors = getAccentClasses(accentColor);
   const fontClass = getFontClass(fontFamily);
 
@@ -42,14 +43,20 @@ export function ClassicTemplate({ portfolio, accentColor = "amber", fontFamily =
       <div className="max-w-[850px] mx-auto py-8 px-4 md:px-0">
         {/* Print/Download Header */}
         <div className="flex justify-between items-center mb-6 print:hidden">
-          <Link href="/">
-            <RevuuLogo className="h-5 w-auto opacity-60 hover:opacity-100 transition-opacity" accentColor={accentColor} />
-          </Link>
-          <button onClick={() => window.print()}
-            className={`inline-flex items-center gap-2 px-4 py-2 ${colors.bg} text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity`}>
-            <Download className="h-4 w-4" />
-            Baixar PDF
-          </button>
+          {showBranding ? (
+            <Link href="/">
+              <RevuuLogo className="h-5 w-auto opacity-60 hover:opacity-100 transition-opacity" accentColor={accentColor} />
+            </Link>
+          ) : (
+            <span className="text-sm font-medium">{profile?.fullName || user.name}</span>
+          )}
+          {planFeatures?.hasExportPdf && (
+            <button onClick={() => window.print()}
+              className={`inline-flex items-center gap-2 px-4 py-2 ${colors.bg} text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity`}>
+              <Download className="h-4 w-4" />
+              Baixar PDF
+            </button>
+          )}
         </div>
 
         {/* Resume Paper */}
@@ -279,10 +286,18 @@ export function ClassicTemplate({ portfolio, accentColor = "amber", fontFamily =
 
           {/* Footer */}
           <footer className="px-8 py-4 border-t bg-muted/30 flex items-center justify-between print:bg-transparent">
-            <p className="text-xs text-muted-foreground">
-              Criado com <Link href="/admin" className={`${colors.text} hover:underline`}>Revuu</Link>
-            </p>
-            <RevuuLogo className="h-4 w-auto opacity-40" accentColor={accentColor} />
+            {showBranding ? (
+              <>
+                <p className="text-xs text-muted-foreground">
+                  Criado com <Link href="/admin" className={`${colors.text} hover:underline`}>Revuu</Link>
+                </p>
+                <RevuuLogo className="h-4 w-auto opacity-40" accentColor={accentColor} />
+              </>
+            ) : (
+              <p className="text-xs text-muted-foreground w-full text-center">
+                © {new Date().getFullYear()} {profile?.fullName || user.name}
+              </p>
+            )}
           </footer>
         </div>
       </div>

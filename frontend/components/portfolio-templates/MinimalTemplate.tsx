@@ -4,9 +4,10 @@ import { RevuuLogo } from "@/components/RevuuLogo";
 import {
   MapPin, Mail, Phone, ExternalLink, Github, Linkedin, Twitter, Globe,
   Briefcase, GraduationCap, ArrowRight, Instagram, Youtube, Dribbble,
-  Palette, ChevronRight,
+  Palette, ChevronRight, MessageSquare, Download,
 } from "lucide-react";
 import { TemplateProps, getAccentClasses, getFontClass } from "./types";
+import { ContactForm } from "./ContactForm";
 
 function formatPeriod(startDate: string, endDate?: string, isCurrent?: boolean): string {
   const start = new Date(startDate).getFullYear();
@@ -16,7 +17,8 @@ function formatPeriod(startDate: string, endDate?: string, isCurrent?: boolean):
 }
 
 export function MinimalTemplate({ portfolio, accentColor = "amber", fontFamily = "inter" }: TemplateProps) {
-  const { user, profile, experiences, educations, skills, projects, pages = [] } = portfolio;
+  const { user, profile, experiences, educations, skills, projects, pages = [], planFeatures } = portfolio;
+  const showBranding = planFeatures?.showBranding !== false;
   const colors = getAccentClasses(accentColor);
   const fontClass = getFontClass(fontFamily);
 
@@ -46,13 +48,27 @@ export function MinimalTemplate({ portfolio, accentColor = "amber", fontFamily =
       {/* Simple Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-b">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
-            <RevuuLogo className="h-5 w-auto opacity-60 hover:opacity-100 transition-opacity" accentColor={accentColor} />
-          </Link>
+          {showBranding ? (
+            <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
+              <RevuuLogo className="h-5 w-auto opacity-60 hover:opacity-100 transition-opacity" accentColor={accentColor} />
+            </Link>
+          ) : (
+            <span className="text-sm font-medium">{profile?.fullName || user.name}</span>
+          )}
           <nav className="flex items-center gap-6">
             {experiences.length > 0 && <a href="#experiencia" className="text-sm text-muted-foreground hover:text-foreground">Experiencia</a>}
             {skills.length > 0 && <a href="#skills" className="text-sm text-muted-foreground hover:text-foreground">Skills</a>}
             {(projects.length > 0 || pages.length > 0) && <a href="#projetos" className="text-sm text-muted-foreground hover:text-foreground">Projetos</a>}
+            {planFeatures?.hasExportPdf && (
+              <button
+                onClick={() => window.print()}
+                className={`flex items-center gap-1.5 text-sm ${colors.text} hover:opacity-80 transition-opacity print:hidden`}
+                title="Exportar como PDF"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Exportar PDF</span>
+              </button>
+            )}
           </nav>
         </div>
       </header>
@@ -276,6 +292,23 @@ export function MinimalTemplate({ portfolio, accentColor = "amber", fontFamily =
         <section className="py-16 px-6 border-t">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-8">Contato</h2>
+
+            {/* Contact Form for PRO/BUSINESS users */}
+            {planFeatures?.hasContactForm && profile?.contactEmail && (
+              <div className="mb-8 p-6 bg-muted/50 rounded-xl">
+                <div className="flex items-center gap-2 mb-4">
+                  <MessageSquare className={`h-5 w-5 ${colors.text}`} />
+                  <h3 className="font-semibold">Envie uma mensagem</h3>
+                </div>
+                <ContactForm
+                  recipientEmail={profile.contactEmail}
+                  recipientName={name}
+                  accentColor={accentColor}
+                />
+              </div>
+            )}
+
+            {/* Contact links */}
             <div className="flex flex-col md:flex-row gap-4">
               {profile?.contactEmail && (
                 <a href={`mailto:${profile.contactEmail}`}
@@ -299,10 +332,18 @@ export function MinimalTemplate({ portfolio, accentColor = "amber", fontFamily =
       {/* Footer */}
       <footer className="py-8 px-6 border-t">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            Criado com <Link href="/admin" className={`${colors.text} hover:underline`}>Revuu</Link>
-          </p>
-          <RevuuLogo className="h-5 w-auto opacity-50" accentColor={accentColor} />
+          {showBranding ? (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Criado com <Link href="/admin" className={`${colors.text} hover:underline`}>Revuu</Link>
+              </p>
+              <RevuuLogo className="h-5 w-auto opacity-50" accentColor={accentColor} />
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center w-full">
+              © {new Date().getFullYear()} {profile?.fullName || user.name}
+            </p>
+          )}
         </div>
       </footer>
     </main>

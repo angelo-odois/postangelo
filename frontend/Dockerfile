@@ -40,7 +40,7 @@ RUN pnpm install --prod
 # Copy built files from builder
 COPY --from=builder /usr/src/app/.next ./.next
 COPY --from=builder /usr/src/app/public ./public
-COPY --from=builder /usr/src/app/next.config.ts ./
+COPY --from=builder /usr/src/app/next.config.mjs ./
 
 # Expose port
 EXPOSE 3000

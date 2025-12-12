@@ -5,7 +5,7 @@ import {
   MapPin, Mail, Phone, ExternalLink, Github, Linkedin, Twitter, Globe,
   Briefcase, GraduationCap, Star, ArrowDown, ArrowRight, Sparkles,
   CheckCircle2, Palette, Code, Layers, Instagram, Youtube, Dribbble,
-  Rocket, Award,
+  Rocket, Award, Download,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { TemplateProps, getAccentClasses, getFontClass } from "./types";
@@ -45,7 +45,8 @@ function getCategoryIcon(category: string) {
 }
 
 export function ModernTemplate({ portfolio, accentColor = "amber", fontFamily = "inter" }: TemplateProps) {
-  const { user, profile, experiences, educations, skills, projects, pages = [] } = portfolio;
+  const { user, profile, experiences, educations, skills, projects, pages = [], planFeatures } = portfolio;
+  const showBranding = planFeatures?.showBranding !== false; // Default to true if not set
   const colors = getAccentClasses(accentColor);
   const fontClass = getFontClass(fontFamily);
 
@@ -109,9 +110,21 @@ export function ModernTemplate({ portfolio, accentColor = "amber", fontFamily = 
             {experiences.length > 0 && <a href="#experiencia" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Experiencia</a>}
             {(projects.length > 0 || pages.length > 0) && <a href="#projetos" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Projetos</a>}
           </div>
-          {profile?.contactEmail && (
-            <a href={`mailto:${profile.contactEmail}`} className={`text-sm px-4 py-2 ${colors.bg} text-white rounded-full hover:shadow-lg transition-all duration-300`}>Contato</a>
-          )}
+          <div className="flex items-center gap-3">
+            {planFeatures?.hasExportPdf && (
+              <button
+                onClick={() => window.print()}
+                className={`text-sm px-4 py-2 border ${colors.border} ${colors.text} rounded-full hover:${colors.bg} hover:text-white transition-all duration-300 print:hidden flex items-center gap-2`}
+                title="Exportar como PDF"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">PDF</span>
+              </button>
+            )}
+            {profile?.contactEmail && (
+              <a href={`mailto:${profile.contactEmail}`} className={`text-sm px-4 py-2 ${colors.bg} text-white rounded-full hover:shadow-lg transition-all duration-300`}>Contato</a>
+            )}
+          </div>
         </nav>
       </header>
 
@@ -431,29 +444,39 @@ export function ModernTemplate({ portfolio, accentColor = "amber", fontFamily = 
         </section>
       )}
 
-      {/* Revuu CTA */}
-      <section className={`py-16 px-6 bg-gradient-to-br ${colors.bg}/10 via-transparent to-transparent border-t border-border/50`}>
-        <div className="max-w-4xl mx-auto text-center">
-          <div className={`inline-flex items-center gap-2 px-4 py-2 ${colors.bg}/10 border ${colors.border}/20 rounded-full ${colors.text} text-sm font-medium mb-6`}>
-            <Sparkles className="h-4 w-4" />
-            Powered by Revuu
+      {/* Revuu CTA - Only show for free users */}
+      {showBranding && (
+        <section className={`py-16 px-6 bg-gradient-to-br ${colors.bg}/10 via-transparent to-transparent border-t border-border/50`}>
+          <div className="max-w-4xl mx-auto text-center">
+            <div className={`inline-flex items-center gap-2 px-4 py-2 ${colors.bg}/10 border ${colors.border}/20 rounded-full ${colors.text} text-sm font-medium mb-6`}>
+              <Sparkles className="h-4 w-4" />
+              Powered by Revuu
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Quer um portfolio como este?</h2>
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Crie seu portfolio profissional em minutos com o <span className={`${colors.text} font-semibold`}>Revuu</span>.
+            </p>
+            <Link href="/admin" className={`group inline-flex items-center justify-center gap-2 px-8 py-4 ${colors.bg} text-white rounded-full font-medium hover:shadow-xl hover:scale-105 transition-all`}>
+              Criar meu Revuu gratis
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Quer um portfolio como este?</h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Crie seu portfolio profissional em minutos com o <span className={`${colors.text} font-semibold`}>Revuu</span>.
-          </p>
-          <Link href="/admin" className={`group inline-flex items-center justify-center gap-2 px-8 py-4 ${colors.bg} text-white rounded-full font-medium hover:shadow-xl hover:scale-105 transition-all`}>
-            Criar meu Revuu gratis
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Footer */}
+      {/* Footer - Only show branding for free users */}
       <footer className="py-8 px-6 border-t border-border/50">
         <div className="max-w-6xl mx-auto flex flex-col items-center">
-          <RevuuLogo className="h-6 w-auto mb-3 opacity-70" accentColor={accentColor} />
-          <p className="text-sm text-muted-foreground text-center max-w-md">A plataforma para profissionais criarem portfolios que convertem.</p>
+          {showBranding ? (
+            <>
+              <RevuuLogo className="h-6 w-auto mb-3 opacity-70" accentColor={accentColor} />
+              <p className="text-sm text-muted-foreground text-center max-w-md">A plataforma para profissionais criarem portfolios que convertem.</p>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center">
+              © {new Date().getFullYear()} {profile?.fullName || user.name}
+            </p>
+          )}
         </div>
       </footer>
     </main>

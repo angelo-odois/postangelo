@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Loader2, ExternalLink, ArrowLeft, Monitor, Smartphone } from "lucide-react";
+import { Save, Loader2, ExternalLink, ArrowLeft, Monitor, Smartphone, Lock, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -110,17 +110,50 @@ export default function TemplatesAdminPage() {
           {/* Template */}
           <Select
             value={settings.template}
-            onValueChange={(value) => setSettings({ ...settings, template: value })}
+            onValueChange={(value) => {
+              const template = TEMPLATES.find((t) => t.id === value);
+              const userPlan = user?.plan || "free";
+              const hasAllTemplates = userPlan === "pro" || userPlan === "business";
+
+              if (template?.isPremium && !hasAllTemplates) {
+                toast({
+                  title: "Template PRO",
+                  description: "Faca upgrade para PRO para usar este template",
+                  variant: "destructive",
+                });
+                return;
+              }
+              setSettings({ ...settings, template: value });
+            }}
           >
-            <SelectTrigger className="w-[140px] h-9">
+            <SelectTrigger className="w-[160px] h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {TEMPLATES.map((template) => (
-                <SelectItem key={template.id} value={template.id}>
-                  {template.name}
-                </SelectItem>
-              ))}
+              {TEMPLATES.map((template) => {
+                const userPlan = user?.plan || "free";
+                const hasAllTemplates = userPlan === "pro" || userPlan === "business";
+                const isLocked = template.isPremium && !hasAllTemplates;
+
+                return (
+                  <SelectItem
+                    key={template.id}
+                    value={template.id}
+                    className={isLocked ? "opacity-60" : ""}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span>{template.name}</span>
+                      {template.isPremium && (
+                        isLocked ? (
+                          <Lock className="h-3 w-3 text-muted-foreground" />
+                        ) : (
+                          <Crown className="h-3 w-3 text-amber-500" />
+                        )
+                      )}
+                    </div>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
 

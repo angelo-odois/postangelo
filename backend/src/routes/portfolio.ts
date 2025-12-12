@@ -15,7 +15,7 @@ const projectRepository = () => AppDataSource.getRepository(Project);
 const pageRepository = () => AppDataSource.getRepository(Page);
 
 // Helper function to build portfolio response
-async function buildPortfolioResponse(userId: string, user: User, includeAllPages = false) {
+async function buildPortfolioResponse(userId: string, user: User, includeAllPages = false, includePlanFeatures = true) {
   const [profile, experiences, educations, skills, projects, pages] = await Promise.all([
     profileRepository().findOne({ where: { userId } }),
     experienceRepository().find({
@@ -43,6 +43,14 @@ async function buildPortfolioResponse(userId: string, user: User, includeAllPage
     }),
   ]);
 
+  // Get plan features for branding decisions
+  const planFeatures = includePlanFeatures ? {
+    plan: user.plan || "free",
+    showBranding: user.plan === "free" || !user.plan, // Free users show branding
+    hasContactForm: user.plan === "pro" || user.plan === "business",
+    hasExportPdf: user.plan === "pro" || user.plan === "business",
+  } : undefined;
+
   return {
     user: {
       id: user.id,
@@ -56,6 +64,7 @@ async function buildPortfolioResponse(userId: string, user: User, includeAllPage
     skills,
     projects,
     pages,
+    planFeatures,
     stats: {
       experiencesCount: experiences.length,
       educationsCount: educations.length,
@@ -170,14 +179,14 @@ router.get(
 
     const user = await userRepository().findOne({
       where: { username },
-      select: ["id", "name", "username", "createdAt"],
+      select: ["id", "name", "username", "createdAt", "plan"],
     });
 
     if (!user) {
       throw new AppError("User not found", 404);
     }
 
-    const response = await buildPortfolioResponse(user.id, user, false);
+    const response = await buildPortfolioResponse(user.id, user, false, true);
 
     // Remove stats from public response (optional - can be kept if desired)
     const publicResponse = { ...response };

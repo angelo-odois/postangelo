@@ -157,3 +157,66 @@
 .full-width-layout .container {
   max-width: 100% !important;
 }
+
+/* Print styles for PDF export */
+@media print {
+  /* Hide navigation and interactive elements */
+  header,
+  nav,
+  .print\\:hidden,
+  button,
+  [role="button"] {
+    display: none !important;
+  }
+
+  /* Reset background colors for print */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Remove shadows and rounded corners */
+  * {
+    box-shadow: none !important;
+  }
+
+  /* Ensure proper page breaks */
+  section {
+    page-break-inside: avoid;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  /* Optimize images */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Show links as URLs */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    opacity: 0.7;
+  }
+
+  /* Remove animations */
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Adjust padding for print margins */
+  main {
+    padding: 0 !important;
+  }
+
+  /* Reset dark mode for print */
+  .dark {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+  }
+}

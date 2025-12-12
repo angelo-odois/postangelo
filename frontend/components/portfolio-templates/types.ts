@@ -1,4 +1,11 @@
 // Shared types for portfolio templates
+export interface PlanFeatures {
+  plan: string;
+  showBranding: boolean;
+  hasContactForm: boolean;
+  hasExportPdf: boolean;
+}
+
 export interface PortfolioData {
   user: {
     id: string;
@@ -6,6 +13,7 @@ export interface PortfolioData {
     username: string;
     memberSince: string;
   };
+  planFeatures?: PlanFeatures;
   profile: {
     id: string;
     fullName: string;
@@ -110,6 +118,7 @@ export interface TemplateInfo {
   name: string;
   description: string;
   preview: string; // Image URL for preview
+  isPremium?: boolean; // Premium templates require PRO or BUSINESS plan
 }
 
 export const TEMPLATES: TemplateInfo[] = [
@@ -136,18 +145,21 @@ export const TEMPLATES: TemplateInfo[] = [
     name: "Split",
     description: "Tela dividida com painel lateral fixo",
     preview: "/templates/bento.png",
+    isPremium: true,
   },
   {
     id: "terminal",
     name: "Terminal",
     description: "Estetica hacker para devs",
     preview: "/templates/terminal.png",
+    isPremium: true,
   },
   {
     id: "gradient",
     name: "Gradient",
     description: "Gradientes bold com glassmorphism",
     preview: "/templates/gradient.png",
+    isPremium: true,
   },
 ];
 
