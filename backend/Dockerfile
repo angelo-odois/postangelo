@@ -9,15 +9,18 @@ RUN corepack enable && corepack prepare pnpm@9 --activate
 # Copy package files
 COPY package.json pnpm-lock.yaml* ./
 
-# Force development mode for installing devDependencies (typescript, etc)
-# Unset any NODE_ENV that might be passed as ARG
-RUN unset NODE_ENV && pnpm install --frozen-lockfile || pnpm install
+# Force development mode to install devDependencies (typescript, etc)
+# This overrides any NODE_ENV ARG passed by the build system
+ENV NODE_ENV=development
+
+# Install ALL dependencies (including devDependencies)
+RUN pnpm install --frozen-lockfile || pnpm install
 
 # Copy source
 COPY . .
 
-# Build TypeScript (force development mode)
-RUN unset NODE_ENV && pnpm build
+# Build TypeScript
+RUN pnpm build
 
 # Production stage
 FROM node:20-alpine
