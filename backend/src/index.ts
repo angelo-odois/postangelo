@@ -27,6 +27,8 @@ app.use(helmet({
 }));
 const allowedOrigins = [
   "http://localhost:3000",
+  "https://revuu.com.br",
+  "https://www.revuu.com.br",
   "https://angelo.odois.com.br",
   process.env.FRONTEND_URL,
 ].filter(Boolean) as string[];
