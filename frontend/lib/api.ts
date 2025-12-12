@@ -334,6 +334,35 @@ export const api = {
 
   getAnalyticsPages: (token: string, period: "7d" | "30d" | "90d" = "30d") =>
     fetchAPI<{ pages: PageAnalytics[] }>(`/api/analytics/pages?period=${period}`, { token }),
+
+  // Subscription
+  getPlans: <T = unknown[]>(token: string) =>
+    fetchAPI<T>("/api/subscription/plans", { token }),
+
+  getCurrentSubscription: <T = unknown>(token: string) =>
+    fetchAPI<T>("/api/subscription/current", { token }),
+
+  checkPlanLimit: (token: string) =>
+    fetchAPI<{ canCreate: boolean; current: number; max: number; plan: string; upgradeRequired: boolean }>(
+      "/api/subscription/check-limit",
+      { token }
+    ),
+
+  upgradePlan: (plan: string, token: string) =>
+    fetchAPI("/api/subscription/upgrade", {
+      method: "POST",
+      body: JSON.stringify({ plan }),
+      token,
+    }),
+
+  cancelSubscription: (token: string) =>
+    fetchAPI("/api/subscription/cancel", {
+      method: "POST",
+      token,
+    }),
+
+  getFeatures: (token: string) =>
+    fetchAPI("/api/subscription/features", { token }),
 };
 
 // Types for Page Templates

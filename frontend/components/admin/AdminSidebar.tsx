@@ -19,10 +19,12 @@ import {
   Settings,
   BarChart3,
   Paintbrush,
+  Crown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ThemeToggleSimple } from "@/components/theme-toggle";
 
 interface NavItem {
@@ -95,6 +97,11 @@ const navSections: NavSection[] = [
   {
     label: "",
     items: [
+      {
+        title: "Meu Plano",
+        href: "/admin/subscription",
+        icon: Crown,
+      },
       {
         title: "Configuracoes",
         href: "/admin/settings",
@@ -223,7 +230,18 @@ export function AdminSidebar() {
                 {user.name?.charAt(0) || user.email?.charAt(0) || "U"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user.name || "Usuario"}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium truncate">{user.name || "Usuario"}</p>
+                  {user.plan && user.plan !== "free" && (
+                    <Badge variant="outline" className={cn(
+                      "text-[10px] px-1.5 py-0",
+                      user.plan === "pro" && "border-indigo-500 text-indigo-600 bg-indigo-50 dark:bg-indigo-950",
+                      user.plan === "business" && "border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-950"
+                    )}>
+                      {user.plan.toUpperCase()}
+                    </Badge>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground truncate">
                   {user.email}
                 </p>

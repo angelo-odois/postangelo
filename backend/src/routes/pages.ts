@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { AppDataSource } from "../data-source.js";
-import { Page, PageStatus } from "../entities/index.js";
+import { Page, PageStatus, User } from "../entities/index.js";
 import { asyncHandler, AppError } from "../middlewares/errorHandler.js";
 import { authenticate, requireRole } from "../middlewares/auth.js";
 import { UserRole } from "../entities/index.js";
 import { cache } from "../services/redis.js";
+import { canCreatePortfolio, getPlanLimits } from "../config/plans.js";
 
 const router: ReturnType<typeof Router> = Router();
 const pageRepository = () => AppDataSource.getRepository(Page);
@@ -165,9 +166,29 @@ router.post(
   "/",
   asyncHandler(async (req, res) => {
     const { title, slug, seoTitle, seoDescription, ogImageUrl, coverImageUrl, contentJSON, status } = req.body;
+    const userId = req.user!.userId;
 
     if (!title || !slug) {
       throw new AppError("Title and slug are required", 400);
+    }
+
+    // Check plan limits for page creation
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    const currentPageCount = await pageRepository().count({
+      where: { createdBy: { id: userId } },
+    });
+
+    if (!canCreatePortfolio(user.plan, currentPageCount)) {
+      const limits = getPlanLimits(user.plan);
+      throw new AppError(
+        `Você atingiu o limite de ${limits.maxPortfolios} página(s) do plano ${user.plan}. Faça upgrade para criar mais páginas.`,
+        403
+      );
     }
 
     const existing = await pageRepository().findOne({ where: { slug } });

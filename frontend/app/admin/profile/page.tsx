@@ -15,6 +15,7 @@ import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { AdminLayout, ProfilePageSkeleton } from "@/components/admin";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { TagInput } from "@/components/ui/tag-input";
 import { toast } from "@/hooks/use-toast";
 
 interface Profile {
@@ -37,6 +38,7 @@ interface Profile {
   phone?: string;
   isAvailableForWork?: boolean;
   availabilityStatus?: string;
+  tags?: string;
 }
 
 export default function ProfileAdminPage() {
@@ -129,6 +131,18 @@ export default function ProfileAdminPage() {
                   onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
                   placeholder="Conte um pouco sobre voce..."
                   rows={4}
+                />
+              </div>
+
+              <div>
+                <Label>Tags</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Adicione tags que descrevem voce (ex: React, UX Design, Node.js)
+                </p>
+                <TagInput
+                  value={profile.tags ? profile.tags.split(",").map(t => t.trim()).filter(Boolean) : []}
+                  onChange={(tags) => setProfile({ ...profile, tags: tags.join(",") })}
+                  placeholder="Digite uma tag e pressione Enter"
                 />
               </div>
 

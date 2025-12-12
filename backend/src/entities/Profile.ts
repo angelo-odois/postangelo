@@ -71,6 +71,10 @@ export class Profile {
   @Column({ type: "varchar", length: 255, nullable: true })
   availabilityStatus?: string;
 
+  // Tags (stored as comma-separated string)
+  @Column({ type: "text", nullable: true })
+  tags?: string;
+
   // Template/Theme
   @Column({ type: "varchar", length: 50, default: "modern" })
   template!: string;

@@ -2,6 +2,9 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { getClientApiUrl } from "./config";
 
+export type UserPlan = "free" | "pro" | "business";
+export type SubscriptionStatus = "active" | "canceled" | "past_due" | "trialing";
+
 interface User {
   id: string;
   name: string;
@@ -10,6 +13,8 @@ interface User {
   username?: string;
   avatarUrl?: string;
   onboardingCompleted?: boolean;
+  plan?: UserPlan;
+  subscriptionStatus?: SubscriptionStatus;
 }
 
 interface AuthState {
@@ -118,6 +123,8 @@ export const useAuthStore = create<AuthState>()(
             username: userData.username,
             avatarUrl: userData.avatarUrl,
             onboardingCompleted: userData.onboardingCompleted,
+            plan: userData.plan,
+            subscriptionStatus: userData.subscriptionStatus,
           });
         } catch {
           // Silently fail - user data sync is not critical

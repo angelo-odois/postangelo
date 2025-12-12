@@ -99,6 +99,8 @@ router.post(
         username: user.username,
         avatarUrl: user.avatarUrl,
         onboardingCompleted: user.onboardingCompleted,
+        plan: user.plan,
+        subscriptionStatus: user.subscriptionStatus,
       },
     });
   })
@@ -159,6 +161,8 @@ router.post(
         username: user.username,
         avatarUrl: user.avatarUrl,
         onboardingCompleted: user.onboardingCompleted,
+        plan: user.plan,
+        subscriptionStatus: user.subscriptionStatus,
       },
     });
   })
@@ -234,7 +238,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const user = await userRepository().findOne({
       where: { id: req.user!.userId },
-      select: ["id", "name", "email", "role", "username", "avatarUrl", "onboardingCompleted", "createdAt"],
+      select: ["id", "name", "email", "role", "username", "avatarUrl", "onboardingCompleted", "createdAt", "plan", "subscriptionStatus"],
     });
 
     if (!user) {
