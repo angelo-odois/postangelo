@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { User, UserRole } from "../entities/index.js";
+import { User, UserRole, UserPlan } from "../entities/index.js";
 import { refreshTokenStore } from "./redis.js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -12,6 +12,7 @@ export interface TokenPayload {
   userId: string;
   email: string;
   role: UserRole;
+  plan: UserPlan;
 }
 
 export interface AuthTokens {
@@ -58,6 +59,7 @@ export const authService = {
       userId: user.id,
       email: user.email,
       role: user.role,
+      plan: user.plan,
     };
 
     return jwt.sign(payload, JWT_SECRET, {
