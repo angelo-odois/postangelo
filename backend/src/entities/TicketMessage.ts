@@ -7,7 +7,7 @@ import {
   JoinColumn,
 } from "typeorm";
 import { User } from "./User.js";
-import { Ticket } from "./Ticket.js";
+import type { Ticket } from "./Ticket.js";
 
 export enum MessageType {
   USER = "user",
@@ -23,7 +23,7 @@ export class TicketMessage {
   @Column({ type: "uuid" })
   ticketId!: string;
 
-  @ManyToOne(() => Ticket, (ticket) => ticket.messages, { onDelete: "CASCADE" })
+  @ManyToOne("Ticket", "messages", { onDelete: "CASCADE" })
   @JoinColumn({ name: "ticketId" })
   ticket!: Ticket;
 

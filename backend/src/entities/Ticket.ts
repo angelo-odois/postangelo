@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from "typeorm";
 import { User } from "./User.js";
-import { TicketMessage } from "./TicketMessage.js";
+import type { TicketMessage } from "./TicketMessage.js";
 
 export enum TicketStatus {
   OPEN = "open",
@@ -95,7 +95,7 @@ export class Ticket {
   @Column({ type: "boolean", default: false })
   slaBreach!: boolean;
 
-  @OneToMany(() => TicketMessage, (message) => message.ticket, { cascade: true })
+  @OneToMany("TicketMessage", "ticket", { cascade: true })
   messages!: TicketMessage[];
 
   @CreateDateColumn()
