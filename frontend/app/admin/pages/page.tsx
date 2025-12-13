@@ -5,9 +5,10 @@ export const dynamic = "force-dynamic";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, FileText, Edit, Trash2, Search } from "lucide-react";
+import { Plus, FileText, Edit, Trash2, Search, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ToastAction } from "@/components/ui/toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { AdminLayout, TemplateSelectionDialog, PagesListSkeleton } from "@/components/admin";
 import { useAuthStore } from "@/lib/store";
@@ -140,9 +141,28 @@ export default function AdminPagesPage() {
 
       setTemplateDialogOpen(false);
       router.push(`/admin/pages/${(newPage as Page).id}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to create page:", error);
-      toast({ title: "Erro ao criar projeto", description: "Verifique se o slug ja existe.", variant: "destructive" });
+      const err = error as { message?: string };
+      const isLimitError = err.message?.includes("limite") || err.message?.includes("upgrade");
+
+      if (isLimitError) {
+        toast({
+          title: "Limite de projetos atingido",
+          description: "Faca upgrade do seu plano para criar mais projetos.",
+          variant: "destructive",
+          action: (
+            <ToastAction altText="Fazer upgrade" asChild>
+              <Link href="/admin/subscription" className="flex items-center gap-1">
+                <Crown className="h-3 w-3" />
+                Upgrade
+              </Link>
+            </ToastAction>
+          ),
+        });
+      } else {
+        toast({ title: "Erro ao criar projeto", description: err.message || "Verifique se o slug ja existe.", variant: "destructive" });
+      }
     } finally {
       setCreating(false);
     }

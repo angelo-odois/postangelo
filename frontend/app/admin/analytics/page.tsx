@@ -404,6 +404,71 @@ export default function AnalyticsPage() {
           </Card>
         </div>
 
+        {/* Team Analytics - BUSINESS only */}
+        {user?.plan === "business" && (
+          <Card className="border-amber-200 dark:border-amber-800 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-amber-500" />
+                Team Analytics
+                <span className="px-2 py-0.5 text-xs bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full">
+                  Business
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="p-4 rounded-lg bg-white/60 dark:bg-black/20">
+                  <p className="text-sm text-muted-foreground">Membros da Equipe</p>
+                  <p className="text-2xl font-bold">1</p>
+                  <p className="text-xs text-muted-foreground mt-1">Limite: ilimitado</p>
+                </div>
+                <div className="p-4 rounded-lg bg-white/60 dark:bg-black/20">
+                  <p className="text-sm text-muted-foreground">Projetos Ativos</p>
+                  <p className="text-2xl font-bold">{pageStats.length}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Total da equipe</p>
+                </div>
+                <div className="p-4 rounded-lg bg-white/60 dark:bg-black/20">
+                  <p className="text-sm text-muted-foreground">Views da Equipe</p>
+                  <p className="text-2xl font-bold">{overview?.totalViews || 0}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Ultimos {period === "7d" ? "7 dias" : period === "30d" ? "30 dias" : "90 dias"}</p>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-amber-200/50 dark:border-amber-800/50">
+                <p className="text-sm text-muted-foreground">
+                  O Team Analytics permite acompanhar metricas de toda a equipe.
+                  Convide membros para sua organizacao nas configuracoes.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Team Analytics Upgrade Card for non-business users */}
+        {user?.plan !== "business" && (
+          <Card className="relative overflow-hidden border-dashed">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-orange-500/5" />
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-muted-foreground">
+                <Users className="h-5 w-5" />
+                Team Analytics
+                <Lock className="h-4 w-4 ml-auto" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Acompanhe metricas de toda a equipe, gerencie membros e veja relatorios consolidados.
+              </p>
+              <Link href="/admin/subscription">
+                <Button size="sm" className="gap-2">
+                  <Crown className="h-4 w-4" />
+                  Upgrade para Business
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Top Pages */}
           <Card className="relative">

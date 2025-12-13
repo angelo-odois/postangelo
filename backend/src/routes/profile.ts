@@ -108,6 +108,9 @@ router.post(
       phone,
       isAvailableForWork,
       availabilityStatus,
+      template,
+      accentColor,
+      fontFamily,
     } = req.body;
 
     let profile = await profileRepository().findOne({ where: { userId } });
@@ -132,6 +135,9 @@ router.post(
         phone: phone ?? profile.phone,
         isAvailableForWork: isAvailableForWork ?? profile.isAvailableForWork,
         availabilityStatus: availabilityStatus ?? profile.availabilityStatus,
+        template: template ?? profile.template,
+        accentColor: accentColor ?? profile.accentColor,
+        fontFamily: fontFamily ?? profile.fontFamily,
       });
     } else {
       if (!fullName) {
@@ -158,6 +164,9 @@ router.post(
         phone,
         isAvailableForWork: isAvailableForWork ?? true,
         availabilityStatus,
+        template: template ?? "modern",
+        accentColor: accentColor ?? "amber",
+        fontFamily: fontFamily ?? "inter",
       });
     }
 

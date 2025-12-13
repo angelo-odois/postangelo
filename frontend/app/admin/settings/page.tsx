@@ -11,7 +11,13 @@ import {
   EyeOff,
   AlertTriangle,
   Trash2,
+  Crown,
+  Lock,
+  Palette,
+  Type,
+  Image as ImageIcon,
 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -387,6 +393,116 @@ export default function SettingsPage() {
                 )}
                 Alterar Senha
               </Button>
+            </CardContent>
+          </Card>
+
+          {/* White Label Card - Business Only */}
+          <Card className={user?.plan !== "business" ? "border-dashed" : "border-amber-200 dark:border-amber-800"}>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Palette className="h-5 w-5 text-amber-500" />
+                  <div>
+                    <CardTitle>White Label</CardTitle>
+                    <CardDescription>
+                      Personalize sua marca no portfolio
+                    </CardDescription>
+                  </div>
+                </div>
+                {user?.plan === "business" ? (
+                  <span className="px-2 py-1 text-xs bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full font-medium">
+                    Business
+                  </span>
+                ) : (
+                  <Lock className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {user?.plan === "business" ? (
+                <div className="space-y-6">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                        Logo Personalizado
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Substitui o logo Revuu pelo seu
+                      </p>
+                      <ImageUpload
+                        value=""
+                        onChange={() => {}}
+                        aspectRatio="wide"
+                        placeholder="Upload do seu logo"
+                        className="h-20"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <Type className="h-4 w-4 text-muted-foreground" />
+                        Nome da Marca
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Aparece no footer do portfolio
+                      </p>
+                      <Input placeholder="Nome da sua empresa" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Palette className="h-4 w-4 text-muted-foreground" />
+                      Cores da Marca
+                    </Label>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Cor Primaria</Label>
+                        <div className="flex gap-2 mt-1">
+                          <Input type="color" className="w-12 h-10 p-1 cursor-pointer" defaultValue="#f59e0b" />
+                          <Input placeholder="#f59e0b" className="flex-1" />
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Cor Secundaria</Label>
+                        <div className="flex gap-2 mt-1">
+                          <Input type="color" className="w-12 h-10 p-1 cursor-pointer" defaultValue="#1f2937" />
+                          <Input placeholder="#1f2937" className="flex-1" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                    <div>
+                      <p className="font-medium">Remover "Powered by Revuu"</p>
+                      <p className="text-xs text-muted-foreground">
+                        Remove completamente a marca Revuu do seu portfolio
+                      </p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" className="sr-only peer" />
+                      <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:bg-amber-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
+                    </label>
+                  </div>
+                  <Button className="gap-2">
+                    <Save className="h-4 w-4" />
+                    Salvar White Label
+                  </Button>
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <Lock className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
+                  <p className="text-muted-foreground mb-4">
+                    Recursos White Label disponiveis apenas no plano Business.
+                    Personalize completamente seu portfolio com sua marca.
+                  </p>
+                  <Link href="/admin/subscription">
+                    <Button className="gap-2">
+                      <Crown className="h-4 w-4" />
+                      Upgrade para Business
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </CardContent>
           </Card>
 

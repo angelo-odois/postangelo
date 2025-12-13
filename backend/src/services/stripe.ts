@@ -2,10 +2,25 @@ import Stripe from "stripe";
 import { AppDataSource } from "../data-source.js";
 import { User, UserPlan, SubscriptionStatus } from "../entities/User.js";
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-11-17.clover",
-});
+// Initialize Stripe lazily to avoid errors in development
+let stripe: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!stripe) {
+    const apiKey = process.env.STRIPE_SECRET_KEY;
+    if (!apiKey) {
+      throw new Error("Stripe API key not configured. Set STRIPE_SECRET_KEY environment variable.");
+    }
+    stripe = new Stripe(apiKey, {
+      apiVersion: "2025-11-17.clover",
+    });
+  }
+  return stripe;
+}
+
+function isStripeConfigured(): boolean {
+  return !!process.env.STRIPE_SECRET_KEY;
+}
 
 // Price IDs from environment
 const PRICE_IDS = {
@@ -53,7 +68,7 @@ export const stripeService = {
       return user.stripeCustomerId;
     }
 
-    const customer = await stripe.customers.create({
+    const customer = await getStripe().customers.create({
       email: user.email,
       name: user.name,
       metadata: {
@@ -85,7 +100,7 @@ export const stripeService = {
       throw new Error(`Price ID not configured for ${plan} ${billingPeriod}`);
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
       payment_method_types: ["card"],
@@ -121,7 +136,7 @@ export const stripeService = {
       throw new Error("User does not have a Stripe customer ID");
     }
 
-    const session = await stripe.billingPortal.sessions.create({
+    const session = await getStripe().billingPortal.sessions.create({
       customer: user.stripeCustomerId,
       return_url: `${process.env.FRONTEND_URL || "https://revuu.com.br"}/admin/subscription`,
     });
@@ -149,7 +164,7 @@ export const stripeService = {
 
     // Get subscription details
     if (session.subscription) {
-      const subscription = await stripe.subscriptions.retrieve(
+      const subscription = await getStripe().subscriptions.retrieve(
         session.subscription as string
       );
 
@@ -263,7 +278,7 @@ export const stripeService = {
     const subscriptionId = invoiceData.subscription as string;
     if (!subscriptionId) return;
 
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
     await this.handleSubscriptionUpdated(subscription);
   },
 
@@ -294,13 +309,20 @@ export const stripeService = {
       throw new Error("User does not have an active subscription");
     }
 
-    await stripe.subscriptions.cancel(user.stripeSubscriptionId);
+    await getStripe().subscriptions.cancel(user.stripeSubscriptionId);
   },
 
   /**
    * Get Stripe instance for webhook verification
    */
   getStripeInstance(): Stripe {
-    return stripe;
+    return getStripe();
+  },
+
+  /**
+   * Check if Stripe is configured
+   */
+  isConfigured(): boolean {
+    return isStripeConfigured();
   },
 };

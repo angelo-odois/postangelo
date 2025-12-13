@@ -20,6 +20,9 @@ import {
   BarChart3,
   Paintbrush,
   Crown,
+  Globe,
+  Key,
+  HeadphonesIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/lib/store";
@@ -92,6 +95,21 @@ const navSections: NavSection[] = [
         href: "/admin/templates",
         icon: Paintbrush,
       },
+      {
+        title: "Dominios",
+        href: "/admin/domains",
+        icon: Globe,
+      },
+    ],
+  },
+  {
+    label: "Avancado",
+    items: [
+      {
+        title: "Acesso API",
+        href: "/admin/api-access",
+        icon: Key,
+      },
     ],
   },
   {
@@ -101,6 +119,11 @@ const navSections: NavSection[] = [
         title: "Meu Plano",
         href: "/admin/subscription",
         icon: Crown,
+      },
+      {
+        title: "Suporte",
+        href: "/admin/support",
+        icon: HeadphonesIcon,
       },
       {
         title: "Configuracoes",
