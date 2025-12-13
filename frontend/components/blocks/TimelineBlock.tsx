@@ -7,6 +7,7 @@ interface TimelineItem {
   title: string;
   description?: string;
   date?: string;
+  tag?: string;
   completed?: boolean;
   icon?: string;
 }
@@ -15,7 +16,7 @@ interface TimelineBlockProps {
   title?: string;
   subtitle?: string;
   items?: TimelineItem[];
-  style?: "default" | "alternating" | "compact";
+  style?: "default" | "alternating" | "compact" | "process";
   lineColor?: "primary" | "muted" | "gradient";
   alignment?: "left" | "center";
 }
@@ -28,7 +29,23 @@ export function TimelineBlock({
   lineColor = "primary",
   alignment = "left",
 }: TimelineBlockProps) {
-  const defaultItems: TimelineItem[] = [
+  const defaultItems: TimelineItem[] = style === "process" ? [
+    {
+      tag: "Research",
+      title: "Desk Research & Benchmarking",
+      description: "Analyzed digital banking context, credit solutions, and competitive landscape to identify market opportunities and gaps.",
+    },
+    {
+      tag: "Discovery",
+      title: "User Research & Validation",
+      description: "Conducted interviews and surveys with low-income users to understand financial needs, pain points, and validate hypotheses.",
+    },
+    {
+      tag: "Analysis",
+      title: "Data Triangulation & Insights",
+      description: "Cross-referenced research data to identify benefits aligned with user demands and extract key pain points.",
+    },
+  ] : [
     {
       title: "Fundacao",
       description: "Inicio da nossa jornada com foco em inovacao",
@@ -62,6 +79,59 @@ export function TimelineBlock({
     muted: "bg-muted-foreground/30",
     gradient: "bg-gradient-to-b from-primary via-primary/50 to-muted",
   };
+
+  // Process style - matches the design reference with cards and tags
+  if (style === "process") {
+    return (
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          {(title || subtitle) && (
+            <div className={cn("mb-12", alignment === "center" && "text-center")}>
+              {title && <h2 className="text-3xl font-bold">{title}</h2>}
+              {subtitle && <p className="mt-3 text-muted-foreground text-lg">{subtitle}</p>}
+            </div>
+          )}
+
+          <div className="relative">
+            {/* Vertical line */}
+            <div className={cn(
+              "absolute left-[11px] top-3 bottom-3 w-0.5",
+              lineColorClasses[lineColor]
+            )} />
+
+            <div className="space-y-6">
+              {displayItems.map((item, index) => (
+                <div key={index} className="relative flex gap-6">
+                  {/* Circle marker */}
+                  <div className="relative z-10 flex-shrink-0">
+                    <div className={cn(
+                      "w-6 h-6 rounded-full border-2 border-primary bg-background flex items-center justify-center",
+                      index === 0 && "bg-primary"
+                    )}>
+                      {index === 0 && <div className="w-2 h-2 rounded-full bg-background" />}
+                    </div>
+                  </div>
+
+                  {/* Card */}
+                  <div className="flex-1 p-6 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 transition-colors">
+                    {(item.tag || item.date) && (
+                      <span className="inline-block px-3 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full mb-3">
+                        {item.tag || item.date}
+                      </span>
+                    )}
+                    <h3 className="font-semibold text-lg">{item.title}</h3>
+                    {item.description && (
+                      <p className="text-muted-foreground mt-2 leading-relaxed">{item.description}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (style === "compact") {
     return (
